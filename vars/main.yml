@@ -1,0 +1,67 @@
+---
+homebrew_installed_packages:
+  - ansible
+  - awscli
+  - aws-shell
+  - bat # cat syntax highlighting
+  - certbot
+  - dive
+  - dust # improved du
+  - duf # improved df
+  - exa # A modern replacement for ls
+  - exercism
+  - fluxcd/tap/flux
+  - gauge
+  - git-chglog
+  - git-flow
+  - go
+  - go-swagger
+  - golangci-lint
+  - gping # ping, but with a graph.
+  - hashicorp/tap/terraform
+  - hashicorp/tap/vault
+  - helm
+  - htop
+  - jq
+  - k6
+  - k9s
+  - kind
+  - kops
+  - kubernetes-cli
+  - kustomize
+  - rs/tap/curlie
+  - skaffold
+  - sonar-scanner
+  - sshpass
+  - switchhosts
+  - tree
+  - unzip
+  - vegeta
+  - watch
+  - weaveworks/tap/eksctl
+  - wget
+
+homebrew_upgrade_all_packages: true
+
+homebrew_taps:
+  - homebrew/core
+  - homebrew/cask
+  - fluxcd/tap
+  - hashicorp/tap
+  - weaveworks/tap
+  - git-chglog/git-chglog
+  - go-swagger/go-swagger
+
+homebrew_cask_appdir: /Applications
+homebrew_cask_apps:
+  - docker
+  - jetbrains-toolbox
+  - lens
+  - lyricsx
+  - pgadmin4
+  - postman
+  - robo-3t
+  - sequel-pro
+  - vagrant
+  - virtualbox
+  - vlc
