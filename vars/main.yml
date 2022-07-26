@@ -1,10 +1,12 @@
 ---
 homebrew_installed_packages:
-  - ansible
   - awscli
   - aws-shell
+  - azure-cli
   - bat # cat syntax highlighting
   - certbot
+  - cowsay
+  - checkov # a static code analysis tool for scanning IaC files
   - dive
   - dust # improved du
   - duf # improved df
@@ -18,6 +20,7 @@ homebrew_installed_packages:
   - go-swagger
   - golangci-lint
   - gping # ping, but with a graph.
+  - hashicorp/tap/packer
   - hashicorp/tap/terraform
   - hashicorp/tap/vault
   - helm
@@ -27,16 +30,22 @@ homebrew_installed_packages:
   - k9s
   - kind
   - kops
+  - kubectx
   - kubernetes-cli
   - kustomize
+  - minikube
+  - node
+  - nvm
+  - openstackclient
   - rs/tap/curlie
   - skaffold
   - sonar-scanner
-  - sshpass
-  - switchhosts
+  - speedtest-cli
+  - tflint # A Pluggable Terraform Linter
   - tree
   - unzip
   - vegeta
+  - yamllint
   - watch
   - weaveworks/tap/eksctl
   - wget
@@ -55,13 +64,33 @@ homebrew_taps:
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
   - docker
+  - drawio
+  - fig # IDE-style autocomplete to terminal.
+  - flock
+  - flycut
+  - google-cloud-sdk
+  - google-chrome
+  - google-drive
+  - iterm2
   - jetbrains-toolbox
   - lens
   - lyricsx
+  - mysqlworkbench
+  - notion
   - pgadmin4
   - postman
   - robo-3t
   - sequel-pro
+  - skype
+  - sourcetree
+  - spectacle
+  - sublime-text
+  - spotify
+  - switchhosts
+  - telegram
   - vagrant
   - virtualbox
+  - visual-studio-code
   - vlc
+  - whatsapp
+  - zoom

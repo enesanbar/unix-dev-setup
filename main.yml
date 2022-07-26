@@ -1,6 +1,5 @@
 ---
 - hosts: localhost
-  user: eanbar
   connection: local
 
   vars_files:
