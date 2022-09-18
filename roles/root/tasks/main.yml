@@ -7,7 +7,6 @@
 
 
 - include_role:
-    name: chrome
-
-- include_role:
-    name: fastvpn
+    name: "{{ item }}"
+  loop:
+    - fastvpn

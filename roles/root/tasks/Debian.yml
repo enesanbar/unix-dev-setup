@@ -1,23 +1,32 @@
 ---
+- name: Debian/Ubuntu Family | Add gpg signing keys
+  become: yes
+  apt_key:
+    url: "{{ item.gpg_key }}"
+    state: present
+    keyring: "{{ item.gpg_keyring_file }}"
+  with_items: "{{ apt_repos }}"
 
-- name: Install packages
+- name: Debian/Ubuntu Family | Adding apt repositories
+  become: yes
+  apt_repository:
+    repo: "{{ item.repo_debian }}"
+    state: "{{ item.repo_desired_state }}"
+    filename: "{{ item.repo_debian_filename }}"
+    update_cache: yes
+  loop: "{{ apt_repos }}"
+
+- name: Install apt packages
   become: true
   apt: 
-    pkg:
-      - awscli
-      - apt-transport-https
-      - bat
-      - certbot
-      - exa
-      - htop
-      - git
-      - golang
-      - gpg
-      - jq
-      - network-manager-openvpn-gnome
-      - wget
+    pkg: "{{ apt_installed_packages }}"
     state: latest
     update_cache: yes
     cache_valid_time: "{{ aptcachetime }}"
   notify:
     - Restart network manager
+
+- name: Install snap packages
+  become: true
+  community.general.snap:
+    name: "{{ snap_installed_packages }}"

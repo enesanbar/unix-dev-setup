@@ -2,3 +2,59 @@
 
 # http://docs.ansible.com/ansible/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 aptcachetime: 3600
+
+apt_repos:
+  - repo_debian_filename: hashicorp
+    repo_desired_state: present
+    repo_debian: deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com jammy main
+    gpg_key: https://apt.releases.hashicorp.com/gpg
+    gpg_keyring_file: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+  - repo_debian_filename: helm
+    repo_desired_state: present
+    repo_debian: deb [arch=amd64 signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main
+    gpg_key: https://baltocdn.com/helm/signing.asc
+    gpg_keyring_file: /usr/share/keyrings/helm.gpg
+    
+  - repo_debian_filename: google
+    repo_desired_state: present
+    repo_debian: deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main
+    gpg_key: https://dl.google.com/linux/linux_signing_key.pub
+    gpg_keyring_file: /usr/share/keyrings/google.gpg
+
+  - repo_debian_filename: kubernetes
+    repo_desired_state: present
+    repo_debian: deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+    gpg_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    gpg_keyring_file: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+  
+  - repo_debian_filename: sublime-text
+    repo_desired_state: present
+    repo_debian: deb [signed-by=/usr/share/keyrings/sublimehq.gpg] https://download.sublimetext.com/ apt/stable/
+    gpg_key: https://download.sublimetext.com/sublimehq-pub.gpg
+    gpg_keyring_file: /usr/share/keyrings/sublimehq.gpg
+
+apt_installed_packages:
+  - awscli
+  - apt-transport-https
+  - bat
+  - certbot
+  - exa
+  - helm
+  - htop
+  - git
+  - golang
+  - google-chrome-stable
+  - gpg
+  - kubectl
+  - jq
+  - network-manager-openvpn-gnome
+  - packer
+  - sublime-text
+  - terraform
+  - vagrant
+  - vault
+  - wget
+
+snap_installed_packages:
+  - spotify
