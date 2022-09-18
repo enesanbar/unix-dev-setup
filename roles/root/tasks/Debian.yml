@@ -1,0 +1,23 @@
+---
+
+- name: Install packages
+  become: true
+  apt: 
+    pkg:
+      - awscli
+      - apt-transport-https
+      - bat
+      - certbot
+      - exa
+      - htop
+      - git
+      - golang
+      - gpg
+      - jq
+      - network-manager-openvpn-gnome
+      - wget
+    state: latest
+    update_cache: yes
+    cache_valid_time: "{{ aptcachetime }}"
+  notify:
+    - Restart network manager

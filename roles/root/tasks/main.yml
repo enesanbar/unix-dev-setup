@@ -1,0 +1,13 @@
+---
+- include: MacOS.yml
+  when: ansible_os_family == 'Darwin'
+
+- include: Debian.yml
+  when: ansible_os_family == 'Debian'
+
+
+- include_role:
+    name: chrome
+
+- include_role:
+    name: fastvpn

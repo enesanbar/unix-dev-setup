@@ -1,0 +1,28 @@
+---
+- name: FastVPN OpenVPN configs
+  ansible.builtin.get_url:
+    url: "{{ fastvpn_config_url }}"
+    dest: "{{ fastvpn_config_zip_dest_path }}"
+
+- name: Create the destination dir for vpn configs
+  ansible.builtin.file:
+    path: "{{ fastvpn_config_dest_dir }}"
+    state: directory
+
+- name: Extract FastVPN config files into
+  ansible.builtin.unarchive:
+    src: "{{ fastvpn_config_zip_dest_path }}"
+    dest: "{{ fastvpn_config_dest_dir }}"
+
+# TODO: not idempotent, keeps adding the same config on the following runs
+- name: Import config files into network manager
+  shell: nmcli connection import type openvpn file {{ fastvpn_config_dest_dir }}/{{ item }}
+  loop:
+    - "tcp/NCVPN-CZ-Prague-TCP.ovpn"
+    - "tcp/NCVPN-FR-Paris-TCP.ovpn"
+    - "tcp/NCVPN-HU-Budapest-TCP.ovpn"
+    - "tcp/NCVPN-NL-Amsterdam-TCP.ovpn"
+    - "tcp/NCVPN-RO-Bucharest-TCP.ovpn"
+    - "tcp/NCVPN-UK-London-TCP.ovpn"
+  when: import_vpn is defined
+  
