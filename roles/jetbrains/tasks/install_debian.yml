@@ -1,0 +1,26 @@
+---
+- name: check sonar web is up
+  uri:
+    url: "{{ jetbrains_releases_url }}"
+    method: GET
+    return_content: yes
+    status_code: 200
+    body_format: json
+  register: result
+  retries: 10
+  delay: 30
+
+- name: Extract jetbrains archive into tmp
+  ansible.builtin.unarchive:
+    src: "{{ result.json.TBA[0].downloads.linux.link }}"
+    dest: /tmp
+    remote_src: yes
+    creates: "{{ jetbrains_config_zip_dest_path }}/{{ jetbrains_app_name }}-{{ result.json.TBA[0].build }}"
+
+- name: Move jetbrains binary to path
+  become: yes
+  copy:
+    remote_src: yes
+    src: "{{ jetbrains_config_zip_dest_path }}/{{ jetbrains_app_name }}-{{ result.json.TBA[0].build }}/{{ jetbrains_app_name }}"
+    dest: "/usr/local/bin/{{ jetbrains_app_name }}"
+    mode: '0777'

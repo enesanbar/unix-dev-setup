@@ -4,6 +4,12 @@
 aptcachetime: 3600
 
 apt_repos:
+  - repo_debian_filename: docker
+    repo_desired_state: present
+    repo_debian: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable
+    gpg_key: https://download.docker.com/linux/ubuntu/gpg
+    gpg_keyring_file: /etc/apt/keyrings/docker.gpg
+
   - repo_debian_filename: hashicorp
     repo_desired_state: present
     repo_debian: deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com jammy main
@@ -35,10 +41,29 @@ apt_repos:
     gpg_keyring_file: /usr/share/keyrings/sublimehq.gpg
 
 apt_installed_packages:
+  # FUSE requirements for jetbrains-toolbox
+  - libfuse2
+  - libxi6
+  - libxrender1
+  - libxtst6 
+  - mesa-utils
+  - libfontconfig
+  - libgtk-3-bin
+  # END FUSE requirements
+
   - awscli
   - apt-transport-https
   - bat
   - certbot
+  - curl
+  
+  # DOCKER start
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose-plugin
+  # DOCKER end
+
   - exa
   - helm
   - htop
@@ -47,14 +72,18 @@ apt_installed_packages:
   - google-chrome-stable
   - gpg
   - kubectl
+  - libmysqlclient-dev
+  - libmariadb-dev
   - jq
   - network-manager-openvpn-gnome
   - packer
+  - python3.10-venv
   - sublime-text
   - terraform
   - vagrant
   - vault
   - wget
+
 
 snap_installed_packages:
   - spotify

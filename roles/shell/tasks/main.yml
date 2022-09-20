@@ -1,0 +1,16 @@
+---
+- name: Install zsh packages
+  become: true
+  apt: 
+    pkg: 
+      - git
+      - zsh
+    state: latest
+    update_cache: yes
+    cache_valid_time: "{{ aptcachetime }}"
+
+- name: change user shell to zsh 
+  become: no
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/zsh

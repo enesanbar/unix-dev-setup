@@ -10,3 +10,5 @@
     name: "{{ item }}"
   loop:
     - fastvpn
+    - jetbrains
+    - shell

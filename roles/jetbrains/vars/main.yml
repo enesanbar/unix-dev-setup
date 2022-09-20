@@ -1,0 +1,6 @@
+---
+# vars file for jetbrains
+jetbrains_app_name: jetbrains-toolbox
+jetbrains_releases_url: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
+jetbrains_config_zip_dest_path: /tmp
+jetbrains_config_dest_dir: /usr/local/bin

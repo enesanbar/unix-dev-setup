@@ -30,3 +30,15 @@
   become: true
   community.general.snap:
     name: "{{ snap_installed_packages }}"
+
+- name: Ensure group "docker" exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+# - name: Add current user to docker group
+#   become: yes
+#   ansible.builtin.user:
+#     name: "{{ ansible_facts['env']['SUDO_USER'] }}"
+#     groups: docker
+#     append: yes
