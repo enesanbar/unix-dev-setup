@@ -26,19 +26,25 @@
   notify:
     - Restart network manager
 
+- include_role:
+    name: github-releases
+  with_items: "{{ github_releases }}"
+
 - name: Install snap packages
   become: true
   community.general.snap:
-    name: "{{ snap_installed_packages }}"
+    name: "{{ item.name }}"
+    classic: "{{ item.classic }}"
+  with_items: "{{ snap_installed_packages }}"
 
 - name: Ensure group "docker" exists
   ansible.builtin.group:
     name: docker
     state: present
 
-# - name: Add current user to docker group
-#   become: yes
-#   ansible.builtin.user:
-#     name: "{{ ansible_facts['env']['SUDO_USER'] }}"
-#     groups: docker
-#     append: yes
+- name: Add current user to docker group
+  become: yes
+  ansible.builtin.user:
+    name: "{{ ansible_facts['env']['USERNAME'] }}"
+    groups: docker
+    append: yes

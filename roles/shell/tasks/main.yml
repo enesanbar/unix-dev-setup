@@ -10,7 +10,7 @@
     cache_valid_time: "{{ aptcachetime }}"
 
 - name: change user shell to zsh 
-  become: no
+  become: yes
   user:
     name: "{{ ansible_user_id }}"
     shell: /bin/zsh

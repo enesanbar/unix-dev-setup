@@ -1,5 +1,5 @@
 ---
-- name: check sonar web is up
+- name: Get jetbrains releases
   uri:
     url: "{{ jetbrains_releases_url }}"
     method: GET
