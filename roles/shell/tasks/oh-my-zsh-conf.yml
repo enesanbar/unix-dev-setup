@@ -1,0 +1,90 @@
+---
+- name: change user shell to zsh
+  become: yes
+  user:
+    name: "{{ ansible_facts['env']['USER']}}"
+    shell: /bin/zsh
+
+- name: Install oh my zsh
+  ansible.builtin.git:
+    repo: git@github.com:ohmyzsh/ohmyzsh.git
+    dest: "{{ oh_my_zsh_path }}"
+
+- name: set permissions of oh-my-zsh
+  become: yes
+  file:
+    path: "{{ oh_my_zsh_path }}"
+    mode: 'go-w'
+    recurse: yes
+
+- name: Download bullet-train theme for oh-my-zsh
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/caiogondim/bullet-train.zsh/master/bullet-train.zsh-theme
+    dest: "{{ oh_my_zsh_bullet_train_path }}"
+
+- name: Add kubectx to the bullet-train theme
+  lineinfile:
+    path: "{{ oh_my_zsh_bullet_train_path }}"
+    line: '    kctx'
+    insertbefore: "    cmd_exec_time"
+
+#- name: Setup powerline fonts
+
+- name: Write zshrc to home directory
+  ansible.builtin.template:
+    src: zshrc.j2
+    dest: "~/.zshrc"
+
+- name: Ensure dotfiles dir exists
+  ansible.builtin.file:
+    path: "{{ shell_dotfiles_dir }}"
+    state: directory
+
+- name: Write shell files to dotfiles directory
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items: "{{ shell_files_to_source }}"
+
+- name: Make sure private file exists
+  file:
+    path: "{{ shell_private_exports }}"
+    state: touch
+
+
+##### ZSH Plugins
+- name: Install oh my zsh plugins
+  ansible.builtin.git:
+    repo: "{{ plugin.repo }}"
+    dest: "{{ plugin.dest }}"
+  with_items:
+    - repo: https://github.com/zsh-users/zsh-autosuggestions.git
+      dest: "{{ oh_my_zsh_path }}/plugins/zsh-autosuggestions"
+    - repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+      dest: "{{ oh_my_zsh_path }}/plugins/zsh-syntax-highlighting"
+    - repo: https://github.com/zdharma-continuum/fast-syntax-highlighting.git
+      dest: "{{ oh_my_zsh_path }}/plugins/fast-syntax-highlighting"
+    - repo: https://github.com/marlonrichert/zsh-autocomplete.git
+      dest: "{{ oh_my_zsh_path }}/plugins/zsh-autocomplete"
+  loop_control:
+    loop_var: plugin
+
+##### COMPLETIONS
+- name: Ensure completions dir exists
+  ansible.builtin.file:
+    path: "{{ oh_my_zsh_path }}/completions"
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Copy completion files to .oh-my-zsh dir
+  ansible.builtin.copy:
+    src: "{{ completion_file.src }}"
+    dest: "{{ completion_file.dest }}"
+  with_items:
+    - src: /snap/kubectx/current/completion/kubectx.bash
+      dest: "{{ oh_my_zsh_path }}/completions/kubectx.bash"
+    - src: /snap/kubectx/current/completion/kubens.bash
+      dest: "{{ oh_my_zsh_path }}/completions/kubens.bash"
+  loop_control:
+    loop_var: completion_file

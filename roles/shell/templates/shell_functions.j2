@@ -1,0 +1,37 @@
+# Create a new directory and enter it
+take () {
+   mkdir $1
+   cd $1
+}
+
+# Docker
+docker_rm() {
+    docker stop $1 && docker rm $1
+}
+
+search_and_replace() {
+    filePattern=$1
+    search=$2
+    replace=$3
+    find casc_configs -name '*.${filePattern}' -print0 | xargs -0 sed -i "" 's%${search}%${replace}%g'
+}
+
+tolower() {
+    echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+vsed() {  
+    search=$1
+    replace=$2
+    shift
+    shift
+    vim -c "bufdo! set eventignore-=Syntax| %s/$search/$replace/gce" $*
+}
+
+ansible_validate() {
+    set -x
+    ansible-playbook --syntax-check $1
+    ansible-lint $1
+    yamllint $1
+    set +x
+}

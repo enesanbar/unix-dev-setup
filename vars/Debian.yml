@@ -67,6 +67,7 @@ apt_installed_packages:
 
   - evolution
   - exa
+  - fonts-powerline
   - helm
   - htop
   - git
@@ -81,6 +82,7 @@ apt_installed_packages:
   - make
   - network-manager-openvpn-gnome
   - packer
+  - python-is-python3
   - python3.10-venv
   - python3-dev
   - sublime-text
@@ -88,7 +90,11 @@ apt_installed_packages:
   - unzip
   - vagrant
   - vault
+  - vim
   - vlc
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
   - zoxide
   - wget
 
@@ -97,6 +103,8 @@ snap_installed_packages:
   - name: dbeaver-ce
     classic: true
   - name: gitkraken
+    classic: true
+  - name: kubectx
     classic: true
   - name: skype
     classic: false
@@ -124,8 +132,9 @@ github_releases:
     arch: amd64
     destination: /usr/local/bin/mkcert
 
-  - repo: bitnami-labs/sealed-secrets
-    name: kubeseal
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kubeseal
+#  FIX tar.gz issue
+#  - repo: bitnami-labs/sealed-secrets
+#    name: kubeseal
+#    os: linux
+#    arch: amd64
+#    destination: /usr/local/bin/kubeseal

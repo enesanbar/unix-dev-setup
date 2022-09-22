@@ -1,0 +1,52 @@
+# Defaults
+export SHELL=/bin/zsh
+
+# Prefer US English and use UTF-8
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US"
+
+# ssh
+export SSH_KEY_PATH="~/.ssh/id_rsa"
+
+# Don’t clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+export PAGER='less'
+
+# Bullet-Train Theme Configuration
+export BULLETTRAIN_KCTX_KCONFIG=/Users/enesanbar/.kube/config
+export BULLETTRAIN_KCTX_BG=blue
+export BULLETTRAIN_KCTX_KUBECTL=true
+export BULLETTRAIN_VIRTUALENV_BG=red
+export BULLETTRAIN_VIRTUALENV_FG=black
+export BULLETTRAIN_GO_FG=black
+export BULLETTRAIN_NVM_FG=black
+# Minimum elapsed time of command execution. If the execution time of a command is smaller than this, the segment will be hidden.
+BULLETTRAIN_EXEC_TIME_ELAPSED=1
+
+# Go lang
+export GOPATH="${HOME}/go"
+export GOROOT="/usr/lib/go/"
+export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
+
+# Kubectl autocompletion
+if [ $commands[kubectl] ]; then source <(kubectl completion zsh); fi
+if [ $commands[helm] ]; then source <(helm completion zsh); fi
+if [ $commands[flux] ]; then source <(flux completion zsh); fi
+
+## Virtualenv wrapper
+export WORKON_HOME=~/.venv
+export PROJECT_HOME=$HOME/workspace
+export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
+#export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+
+# Python environment
+export PYTHONSTARTUP={{ python_startup_file_location }}
+
+# Terraform
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/terraform terraform
+
+# AWS
+export AWS_PROFILE=default

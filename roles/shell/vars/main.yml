@@ -1,2 +1,18 @@
 ---
-# vars file for shell
+shell_dotfiles_dir: "~/dotfiles"
+shell_private_exports: "{{ shell_dotfiles_dir }}/private"
+
+shell_files_to_source:
+  - src: "shell_exports.j2"
+    dest: "{{ shell_dotfiles_dir }}/.shell_exports"
+  - src: "shell_aliases.j2"
+    dest: "{{ shell_dotfiles_dir }}/.shell_aliases"
+  - src: "shell_functions.j2"
+    dest: "{{ shell_dotfiles_dir }}/.shell_functions"
+
+oh_my_zsh_path: "~/.oh-my-zsh"
+oh_my_zsh_bullet_train_path: "{{ oh_my_zsh_path }}/themes/bullet-train.zsh-theme"
+
+python_startup_file_location: "~/.pythonrc"
+global_gitignore_path: "~/.gitignore"
+global_gitconfig_path: "~/.gitconfig"

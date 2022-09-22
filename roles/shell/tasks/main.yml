@@ -1,16 +1,28 @@
 ---
-- name: Install zsh packages
-  become: true
-  apt: 
-    pkg: 
-      - git
-      - zsh
-    state: latest
-    update_cache: yes
-    cache_valid_time: "{{ aptcachetime }}"
+# tasks file for shell
+- name: Import install_debian.yml if OS family is Debian
+  import_tasks: oh-my-zsh-conf.yml
 
-- name: change user shell to zsh 
-  become: yes
-  user:
-    name: "{{ ansible_user_id }}"
-    shell: /bin/zsh
+- name: Import install_debian.yml if OS family is Debian
+  import_tasks: install_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Copy rc files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - src: pythonrc.py
+      dest: "{{ python_startup_file_location }}"
+    - src: gitignore
+      dest: "{{ global_gitignore_path }}"
+
+- name: Copy templates dotfiles
+  ansible.builtin.template:
+    src: "{{ file.src }}"
+    dest: "{{ file.dest }}"
+  with_items:
+    - src: "gitconfig.j2"
+      dest: "{{ global_gitconfig_path }}"
+  loop_control:
+    loop_var: file

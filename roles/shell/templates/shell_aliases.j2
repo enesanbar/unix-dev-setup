@@ -1,0 +1,22 @@
+# Pretty print for git log
+alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# git
+alias gs="git status"
+
+alias print_path="echo $PATH | tr ':' '\n'"
+
+# Kubernetes
+alias k=kubectl
+alias kx=kubectx
+alias kns=kubens
+alias bb="kubectl run busybox --image=busybox:1.28 --rm -it --restart=Never --command --"
+
+# System
+alias ll="ls -laothrF"
+
+alias vim='vim -c "colorscheme desert" '
+
+alias pyclean='find . \    \( -type f -name "*.py[co]" -o -type d -name "__pycache__" \) -delete &&    echo "Removed pycs and __pycache__"'
+
+alias pg='ps aux | grep -v grep | grep $1'

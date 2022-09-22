@@ -1,0 +1,56 @@
+export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+# Path to your oh-my-zsh installation.
+export ZSH=$HOME/.oh-my-zsh
+
+ZSH_THEME="bullet-train"
+
+plugins=(
+  ansible
+  aws
+  colored-man-pages
+  colorize
+  common-aliases
+  docker
+  docker-compose
+  git
+  git-extras
+  git-prompt
+  branch
+  golang
+  helm
+  history
+  history-substring-search
+  kubectl
+  kubectx
+  man
+  operator-sdk
+  python
+  pip
+  pipenv
+  terraform
+  timer
+
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  fast-syntax-highlighting
+  # zsh-autocomplete
+)
+
+source $ZSH/oh-my-zsh.sh
+
+{% for shell_file in shell_files_to_source %}
+    source {{ shell_file.dest }}
+{% endfor %}
+
+source {{ shell_private_exports }}
+
+# You may need to manually set your language environment
+export LANG=en_US.UTF-8
+
+# setup virtualenv to work on the python at ~/.envs/python
+# TODO: create virtualenv or check if it exists
+workon python
+
+#HISTSIZE=999999999
+#SAVEHIST=$HISTSIZE
