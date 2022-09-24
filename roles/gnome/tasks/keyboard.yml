@@ -1,0 +1,6 @@
+---
+- name: Configure available keyboard layouts in Gnome
+  community.general.dconf:
+    key: "`/org/gnome/desktop/input-sources/sources`"
+    value: "[('xkb', 'us'), ('xkb', 'tr')]"
+    state: present

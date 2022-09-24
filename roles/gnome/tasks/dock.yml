@@ -1,0 +1,51 @@
+---
+- name: Set dash-to-dock settings
+  community.general.dconf:
+    key: "/org/gnome/shell/extensions/dash-to-dock/{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  with_items:
+    - key: "dash-max-icon-size"
+      value: 46
+    - key: "click-action"
+      value: "'minimize-or-overview'"
+    - key: "extend-height"
+      value: "false"
+    #        - key: "unity-backlit-items"
+    #          value: "true"
+    - key: "dock-position"
+      value: "'BOTTOM'"
+    - key: "transparency-mode"
+      value: "'FIXED'"
+    - key: "dock-fixed"
+      value: "false"
+    - key: "autohide"
+      value: "true"
+    - key: "intellihide"
+      value: "true"
+    - key: "intellihide-mode"
+      value: "'FOCUS_APPLICATION_WINDOWS'"
+    - key: "middle-click-action"
+      value: "'quit'"
+    - key: "scroll-action"
+      value: "'cycle-windows'"
+    - key: "hide-delay"
+      value: "5"
+
+- name: Set gnome shell settings
+  community.general.dconf:
+    key: "/org/gnome/shell/{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  with_items:
+    - key: "favorite-apps"
+      value:
+        [
+          'google-chrome.desktop',
+          'thunderbird.desktop',
+          'org.gnome.Nautilus.desktop',
+          'spotify_spotify.desktop',
+          'code.desktop',
+          'org.gnome.Terminal.desktop'
+        ]
+

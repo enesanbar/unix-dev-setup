@@ -1,0 +1,11 @@
+---
+- name: Set dash-to-dock settings
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  with_items:
+    - key: "show-battery-percentage"
+      value: "true"
+    - key: "clock-show-weekday"
+      value: "true"

@@ -1,0 +1,10 @@
+---
+# tasks file for gnome
+
+- name: Import keyboard.yml
+  include_tasks: "{{ item }}"
+  when: ansible_os_family == "Debian"
+  with_items:
+    - keyboard.yml
+    - dock.yml
+    - desktop.yml
