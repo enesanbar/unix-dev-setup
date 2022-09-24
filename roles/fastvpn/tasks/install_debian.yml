@@ -24,5 +24,3 @@
     - "tcp/NCVPN-NL-Amsterdam-TCP.ovpn"
     - "tcp/NCVPN-RO-Bucharest-TCP.ovpn"
     - "tcp/NCVPN-UK-London-TCP.ovpn"
-  when: import_vpn is defined
-  

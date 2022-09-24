@@ -74,6 +74,7 @@ apt_installed_packages:
   - golang
   - google-chrome-stable
   - gpg
+  - guake
   - kubectl
   - libmysqlclient-dev
   - libmariadb-dev
@@ -86,6 +87,7 @@ apt_installed_packages:
   - python3.10-venv
   - python3-dev
   - sublime-text
+  - terminator
   - terraform
   - unzip
   - vagrant
@@ -112,6 +114,8 @@ snap_installed_packages:
     classic: false
   - name: spotify
     classic: false
+  - name: trello-desktop
+    classic: false
 
 github_releases:
   - repo: kubernetes-sigs/kind
@@ -119,22 +123,27 @@ github_releases:
     os: linux
     arch: amd64
     destination: /usr/local/bin/kind
+    type: binary
 
   - repo: wercker/stern
     name: stern
     os: linux
     arch: amd64
     destination: /usr/local/bin/stern
+    type: binary
 
   - repo: FiloSottile/mkcert
     name: mkcert
     os: linux
     arch: amd64
     destination: /usr/local/bin/mkcert
+    type: binary
 
-#  FIX tar.gz issue
-#  - repo: bitnami-labs/sealed-secrets
-#    name: kubeseal
-#    os: linux
-#    arch: amd64
-#    destination: /usr/local/bin/kubeseal
+  - repo: bitnami-labs/sealed-secrets
+    name: kubeseal
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/kubeseal
+    type: tar.gz
+    binary_location: kubeseal
+

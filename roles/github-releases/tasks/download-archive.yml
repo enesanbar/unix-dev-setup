@@ -1,0 +1,24 @@
+---
+- name: Get specific release address
+  ansible.builtin.set_fact:
+    browser_download_url: "{{ result.json | to_json | from_json | community.general.json_query(browser_download_url_query) }}"
+  vars:
+    browser_download_url_query: "assets[?contains(name,'{{ item.name }}')] | [?contains(name,'{{ item.os }}')] | [?contains(name,'{{ item.arch }}')] |  [?ends_with(name,'{{ item.type }}')].browser_download_url"
+    # browser_download_url_query: "assets[?name=='{{ item.name }}'].browser_download_url"
+
+- name: Download GitHub release archive
+  ansible.builtin.get_url:
+    url: "{{ browser_download_url[0] }}"
+    dest: "/tmp/{{ item.name }}-{{ version }}.{{ item.type }}"
+
+- name: Extract downloaded release
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ item.name }}-{{ version }}.{{ item.type }}"
+    dest: "/tmp/"
+
+- name: Copy downloaded file to destination
+  become: yes
+  ansible.builtin.copy:
+    src: "/tmp/{{ item.binary_location }}"
+    dest: "{{ item.destination }}"
+    mode: '0755'

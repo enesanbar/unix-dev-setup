@@ -46,6 +46,6 @@
           'org.gnome.Nautilus.desktop',
           'spotify_spotify.desktop',
           'code.desktop',
-          'org.gnome.Terminal.desktop'
+          'terminator.desktop',
+          'trello-desktop_trello-desktop.desktop'
         ]
-

@@ -1,6 +1,9 @@
 ---
 roles:
   - name: elliotweiser.osx-command-line-tools
+  - name: cloudalchemy.prometheus
+  - name: cloudalchemy.grafana
+  - name: cloudalchemy.node_exporter
 
 collections:
   - name: geerlingguy.mac

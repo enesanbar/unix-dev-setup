@@ -1,0 +1,24 @@
+---
+# vars file for monitoring
+prometheus_targets:
+  node:
+    - targets:
+        - localhost:9100
+
+prometheus_web_listen_address: localhost:9090
+
+grafana_security:
+  admin_user: admin
+  admin_password: admin
+
+grafana_datasources:
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    url: 'http://{{ prometheus_web_listen_address }}'
+    basicAuth: false
+
+grafana_dashboards:
+  - dashboard_id: 11074
+    revision_id: 1
+    datasource: prometheus

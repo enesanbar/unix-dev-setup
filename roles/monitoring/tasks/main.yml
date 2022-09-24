@@ -1,0 +1,10 @@
+---
+# tasks file for monitoring
+- include_role:
+    name: cloudalchemy.node_exporter
+
+- include_role:
+    name: cloudalchemy.prometheus
+
+- include_role:
+    name: cloudalchemy.grafana
