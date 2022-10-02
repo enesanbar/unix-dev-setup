@@ -1,7 +1,7 @@
 ---
 # tasks file for python
 - name: Install global pip packages
-  become: yes
   ansible.builtin.pip:
-    name: psutil
-    executable: /usr/bin/pip3
+    virtualenv: "{{ python_virtual_env_python }}"
+    name: "{{ python_virtual_env_pip_packages }}"
+    state: present

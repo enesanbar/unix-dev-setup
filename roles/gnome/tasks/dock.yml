@@ -5,22 +5,20 @@
     value: "{{ item.value }}"
     state: present
   with_items:
-    - key: "dash-max-icon-size"
-      value: 46
-    - key: "click-action"
-      value: "'minimize-or-overview'"
-    - key: "extend-height"
-      value: "false"
-    #        - key: "unity-backlit-items"
-    #          value: "true"
-    - key: "dock-position"
-      value: "'BOTTOM'"
-    - key: "transparency-mode"
-      value: "'FIXED'"
-    - key: "dock-fixed"
-      value: "false"
     - key: "autohide"
       value: "true"
+    - key: "click-action"
+      value: "'minimize-or-overview'"
+    - key: "dock-fixed"
+      value: "false"
+    - key: "dash-max-icon-size"
+      value: 46
+    - key: "dock-position"
+      value: "'BOTTOM'"
+    - key: "extend-height"
+      value: "false"
+    - key: "hide-delay"
+      value: "5"
     - key: "intellihide"
       value: "true"
     - key: "intellihide-mode"
@@ -29,8 +27,10 @@
       value: "'quit'"
     - key: "scroll-action"
       value: "'cycle-windows'"
-    - key: "hide-delay"
-      value: "5"
+    - key: "show-mounts"
+      value: "false"
+    - key: "transparency-mode"
+      value: "'FIXED'"
 
 - name: Set gnome shell settings
   community.general.dconf:
@@ -42,10 +42,11 @@
       value:
         [
           'google-chrome.desktop',
-          'thunderbird.desktop',
+          'org.gnome.Evolution.desktop',
           'org.gnome.Nautilus.desktop',
           'spotify_spotify.desktop',
           'code.desktop',
           'terminator.desktop',
-          'trello-desktop_trello-desktop.desktop'
+          'trello-desktop_trello-desktop.desktop',
+          'notion-snap_notion-snap.desktop'
         ]

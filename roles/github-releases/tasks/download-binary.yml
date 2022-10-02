@@ -1,5 +1,7 @@
 ---
 - name: Get specfic release address
+  retries: 3
+  delay: 3
   ansible.builtin.set_fact:
     browser_download_url: "{{ result.json | to_json | from_json | community.general.json_query(browser_download_url_query) }}"
   vars:
@@ -7,6 +9,8 @@
     # browser_download_url_query: "assets[?name=='{{ item.name }}'].browser_download_url"
 
 - name: Download GitHub release binary
+  retries: 3
+  delay: 3
   ansible.builtin.get_url:
     url: "{{ browser_download_url[0] }}"
     dest: "/tmp/{{ item.name }}-{{ version }}"

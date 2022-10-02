@@ -48,3 +48,8 @@
     name: "{{ ansible_facts['env']['USERNAME'] }}"
     groups: docker
     append: yes
+
+- include_role:
+    name: "{{ item }}"
+  loop:
+    - linux

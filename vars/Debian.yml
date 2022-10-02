@@ -40,6 +40,12 @@ apt_repos:
     gpg_key: https://download.sublimetext.com/sublimehq-pub.gpg
     gpg_keyring_file: /usr/share/keyrings/sublimehq.gpg
 
+  - repo_debian_filename: telepresence
+    repo_desired_state: present
+    repo_debian: deb [signed-by=/usr/share/keyrings/datawireio_telepresence-archive-keyring.gpg] https://packagecloud.io/datawireio/telepresence/ubuntu/ xenial main
+    gpg_key: https://packagecloud.io/datawireio/telepresence/gpgkey
+    gpg_keyring_file: /usr/share/keyrings/datawireio_telepresence-archive-keyring.gpg
+
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2
@@ -51,9 +57,9 @@ apt_installed_packages:
   - libgtk-3-bin
   # END FUSE requirements
 
-  - awscli
   - apt-transport-https
   - bat
+  - btop
   - certbot
   - curl
   
@@ -66,10 +72,12 @@ apt_installed_packages:
   # DOCKER end
 
   - evolution
+  - evolution-plugins
   - exa
   - fonts-powerline
   - helm
   - htop
+  - gimp
   - git
   - golang
   - google-chrome-stable
@@ -83,10 +91,12 @@ apt_installed_packages:
   - make
   - network-manager-openvpn-gnome
   - packer
+  - pinta
   - python-is-python3
   - python3.10-venv
   - python3-dev
   - sublime-text
+  - telepresence
   - terminator
   - terraform
   - unzip
@@ -106,8 +116,12 @@ snap_installed_packages:
     classic: true
   - name: gitkraken
     classic: true
+  - name: flock-chat
+    classic: false
   - name: kubectx
     classic: true
+  - name: notion-snap
+    classic: false
   - name: skype
     classic: false
   - name: slack
@@ -116,6 +130,7 @@ snap_installed_packages:
     classic: false
   - name: trello-desktop
     classic: false
+
 
 github_releases:
   - repo: kubernetes-sigs/kind
@@ -147,3 +162,26 @@ github_releases:
     type: tar.gz
     binary_location: kubeseal
 
+  - repo: gruntwork-io/terragrunt
+    name: terragrunt
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/terragrunt
+    type: binary
+
+  - repo: tsenart/vegeta
+    name: vegeta
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/vegeta
+    type: tar.gz
+    binary_location: vegeta
+
+python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.venv"
+python_virtual_env_python: "{{ python_virtual_envs_folder }}/python"
+python_virtual_env_pip_packages:
+  - docker
+  - gitman
+  - psutil
+  - pytest
+  - refurb

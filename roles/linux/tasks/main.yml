@@ -1,0 +1,44 @@
+ ---
+- name: Setup file-max limit
+  become: yes
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - name: "fs.file-max"
+      value: 2618107
+    - name: "fs.inotify.max_user_instances"
+      value: 2048
+    - name: "fs.inotify.max_user_watches"
+      value: 5242880
+
+- name: Added pam_limits module
+  become: yes
+  community.general.pamd:
+    state: after
+    name: common-session
+    type: session
+    module_path: pam_unix.so
+    control: required
+    new_type: session
+    new_module_path: pam_limits.so
+    new_control: required
+    backup: yes
+
+- name: Setup nofiles and nproc limit
+  become: yes
+  pam_limits:
+    domain: "*"
+    limit_type: "{{ item.limit_type }}"
+    limit_item: "{{ item.limit_item }}"
+    value: "{{ item.value }}"
+  loop:
+    # Type "-" for enforcing both soft and hard resource limits together for more details read `man limits.conf`.
+    - limit_type: '-'
+      limit_item: 'nofile'
+      value: 978160
+    - limit_type: '-'
+      limit_item: 'nproc'
+      value: 978160

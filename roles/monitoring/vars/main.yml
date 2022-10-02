@@ -22,3 +22,8 @@ grafana_dashboards:
   - dashboard_id: 11074
     revision_id: 1
     datasource: prometheus
+  - dashboard_id: 1860
+    revision_id: 1
+    datasource: prometheus
+
+_node_exporter_system_group: root

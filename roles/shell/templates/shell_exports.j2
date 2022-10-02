@@ -35,11 +35,18 @@ if [ $commands[helm] ]; then source <(helm completion zsh); fi
 if [ $commands[flux] ]; then source <(flux completion zsh); fi
 
 ## Virtualenv wrapper
-export WORKON_HOME=~/.venv
+export WORKON_HOME="{{ python_virtual_envs_folder }}"
 export PROJECT_HOME=$HOME/workspace
 export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
 #export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+
+# setup virtualenv to work on the python at ~/.env/python
+# TODO: create virtualenv named python if not exists
+workon python
+
+# Python autocomplete
+if [ $commands[register-python-argcomplete] ]; then source <(register-python-argcomplete pytest); fi
 
 # Python environment
 export PYTHONSTARTUP={{ python_startup_file_location }}
@@ -50,3 +57,5 @@ complete -o nospace -C /usr/bin/terraform terraform
 
 # AWS
 export AWS_PROFILE=default
+
+autoload -U compinit; compinit

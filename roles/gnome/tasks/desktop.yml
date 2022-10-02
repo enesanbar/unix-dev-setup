@@ -9,3 +9,15 @@
       value: "true"
     - key: "clock-show-weekday"
       value: "true"
+
+- name: Set keybindings
+  community.general.dconf:
+    key: "/org/gnome/desktop/wm/keybindings/{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  with_items:
+    - key: "minimize"
+      value:
+        [
+          "<Super>h"
+        ]
