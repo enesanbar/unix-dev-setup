@@ -26,13 +26,13 @@ BULLETTRAIN_EXEC_TIME_ELAPSED=1
 
 # Go lang
 export GOPATH="${HOME}/go"
-export GOROOT="/usr/lib/go/"
 export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
 
 # Kubectl autocompletion
 if [ $commands[kubectl] ]; then source <(kubectl completion zsh); fi
 if [ $commands[helm] ]; then source <(helm completion zsh); fi
 if [ $commands[flux] ]; then source <(flux completion zsh); fi
+if [ $commands[kubebuilder] ]; then source <(kubebuilder completion zsh); fi
 
 ## Virtualenv wrapper
 export WORKON_HOME="{{ python_virtual_envs_folder }}"

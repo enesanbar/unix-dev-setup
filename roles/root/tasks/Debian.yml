@@ -35,6 +35,7 @@
   community.general.snap:
     name: "{{ item.name }}"
     classic: "{{ item.classic }}"
+    channel: "{{ item.channel | default('stable') }}"
   with_items: "{{ snap_installed_packages }}"
 
 - name: Ensure group "docker" exists

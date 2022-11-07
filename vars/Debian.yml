@@ -79,7 +79,6 @@ apt_installed_packages:
   - htop
   - gimp
   - git
-  - golang
   - google-chrome-stable
   - gpg
   - guake
@@ -104,6 +103,7 @@ apt_installed_packages:
   - vault
   - vim
   - vlc
+  - yamllint
   - zsh
   - zsh-autosuggestions
   - zsh-syntax-highlighting
@@ -118,6 +118,9 @@ snap_installed_packages:
     classic: true
   - name: flock-chat
     classic: false
+  - name: go
+    classic: true
+    channel: 1.19/stable
   - name: kubectx
     classic: true
   - name: notion-snap
@@ -138,6 +141,13 @@ github_releases:
     os: linux
     arch: amd64
     destination: /usr/local/bin/kind
+    type: binary
+
+  - repo: kubernetes-sigs/kubebuilder
+    name: kubebuilder
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/kubebuilder
     type: binary
 
   - repo: wercker/stern
@@ -169,6 +179,20 @@ github_releases:
     destination: /usr/local/bin/terragrunt
     type: binary
 
+  - repo: argoproj/argo-cd
+    name: argocd
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/argocd
+    type: binary
+
+  - repo: mozilla/sops
+    name: sops
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/sops
+    type: binary
+
   - repo: tsenart/vegeta
     name: vegeta
     os: linux
@@ -176,6 +200,30 @@ github_releases:
     destination: /usr/local/bin/vegeta
     type: tar.gz
     binary_location: vegeta
+
+  - repo: norwoodj/helm-docs
+    name: helm-docs
+    os: Linux
+    arch: x86_64
+    destination: /usr/local/bin/helm-docs
+    type: tar.gz
+    binary_location: helm-docs
+
+  - repo: helm/chart-testing
+    name: chart-testing
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/ct
+    type: tar.gz
+    binary_location: ct
+
+  - repo: wagoodman/dive
+    name: dive
+    os: linux
+    arch: amd64
+    destination: /usr/local/bin/dive
+    type: tar.gz
+    binary_location: dive
 
 python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.venv"
 python_virtual_env_python: "{{ python_virtual_envs_folder }}/python"

@@ -1,4 +1,4 @@
- ---
+---
 - name: Setup file-max limit
   become: yes
   sysctl:
@@ -10,7 +10,7 @@
     - name: "fs.file-max"
       value: 2618107
     - name: "fs.inotify.max_user_instances"
-      value: 2048
+      value: 8192
     - name: "fs.inotify.max_user_watches"
       value: 5242880
 
