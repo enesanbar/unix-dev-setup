@@ -125,6 +125,8 @@ snap_installed_packages:
     classic: true
   - name: notion-snap
     classic: false
+  - name: postman
+    classic: false
   - name: skype
     classic: false
   - name: slack

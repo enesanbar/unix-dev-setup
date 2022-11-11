@@ -33,6 +33,7 @@ if [ $commands[kubectl] ]; then source <(kubectl completion zsh); fi
 if [ $commands[helm] ]; then source <(helm completion zsh); fi
 if [ $commands[flux] ]; then source <(flux completion zsh); fi
 if [ $commands[kubebuilder] ]; then source <(kubebuilder completion zsh); fi
+if [ $commands[stern] ]; then source <(stern --completion=zsh); fi
 
 ## Virtualenv wrapper
 export WORKON_HOME="{{ python_virtual_envs_folder }}"

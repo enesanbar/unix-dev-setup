@@ -1,0 +1,13 @@
+---
+- name: Download kubectx zsh completions to fpath
+  become: yes
+  retries: 3
+  delay: 3
+  ansible.builtin.get_url:
+    url: "{{ item.src }}"
+    dest: "{{ ansible_facts['env']['ZSH'] }}/completions/{{ item.dest }}"
+  with_items:
+    - src: "https://raw.githubusercontent.com/ahmetb/kubectx/master/completion/_kubectx.zsh"
+      dest: "_kubectx.zsh"
+    - src: "https://raw.githubusercontent.com/ahmetb/kubectx/master/completion/_kubens.zsh"
+      dest: "_kubens.zsh"

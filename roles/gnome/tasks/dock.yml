@@ -45,6 +45,7 @@
           'org.gnome.Evolution.desktop',
           'org.gnome.Nautilus.desktop',
           'spotify_spotify.desktop',
+          'postman_postman.desktop',
           'code.desktop',
           'terminator.desktop',
           'trello-desktop_trello-desktop.desktop',
