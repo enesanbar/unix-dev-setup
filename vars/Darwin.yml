@@ -1,11 +1,13 @@
 ---
 homebrew_installed_packages:
+  - ansible-lint
   - awscli
   - aws-shell
   - azure-cli
   - bat # cat syntax highlighting
   - btop
   - certbot
+  - coreutils
   - cowsay
   - checkov # a static code analysis tool for scanning IaC files
   - dive
@@ -17,10 +19,13 @@ homebrew_installed_packages:
   - gauge
   - git-chglog
   - git-flow
+  - gnu-sed
+  - gh
   - go
   - go-swagger
   - golangci-lint
   - gping # ping, but with a graph.
+  - graphviz
   - hashicorp/tap/packer
   - hashicorp/tap/terraform
   - hashicorp/tap/vault
@@ -33,20 +38,25 @@ homebrew_installed_packages:
   - kops
   - kubectx
   - kubernetes-cli
+  - kubeseal
   - kustomize
   - minikube
+  - mkcert
   - node
   - nvm
   - openstackclient
+  - python-yq
   - rs/tap/curlie
   - skaffold
   - sonar-scanner
   - speedtest-cli
+  - terragrunt
   - tflint # A Pluggable Terraform Linter
   - tree
   - unzip
   - vegeta
   - yamllint
+  - yarn
   - watch
   - weaveworks/tap/eksctl
   - wget
