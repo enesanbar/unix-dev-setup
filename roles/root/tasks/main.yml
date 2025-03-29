@@ -4,19 +4,18 @@
     var: ansible_facts
   when: debug is defined
 
-- include: MacOS.yml
+- import_tasks: MacOS.yml
   when: ansible_os_family == 'Darwin'
 
-- include: Debian.yml
+- import_tasks: Debian.yml
   when: ansible_os_family == 'Debian'
 
 
 - include_role:
     name: "{{ item }}"
   loop:
-    - fastvpn
     - jetbrains
     - shell
     - python
     - gnome
-#    - monitoring
+    - monitoring

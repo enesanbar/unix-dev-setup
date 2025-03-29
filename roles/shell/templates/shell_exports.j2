@@ -37,14 +37,14 @@ if [ $commands[stern] ]; then source <(stern --completion=zsh); fi
 
 ## Virtualenv wrapper
 export WORKON_HOME="{{ python_virtual_envs_folder }}"
-export PROJECT_HOME=$HOME/workspace
-export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
+#export PROJECT_HOME=$HOME/workspace
+#export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
 #export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper.sh
 
 # setup virtualenv to work on the python at ~/.env/python
 # TODO: create virtualenv named python if not exists
-workon python
+workon latest_v312
 
 # Python autocomplete
 if [ $commands[register-python-argcomplete] ]; then source <(register-python-argcomplete pytest); fi

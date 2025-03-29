@@ -71,6 +71,7 @@
 
 ##### COMPLETIONS
 - name: Ensure completions dir exists
+  become: false
   ansible.builtin.file:
     path: "{{ oh_my_zsh_path }}/completions"
     state: directory

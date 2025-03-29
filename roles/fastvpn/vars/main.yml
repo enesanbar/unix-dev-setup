@@ -1,4 +1,0 @@
----
-# vars file for fastvpn
-fastvpn_config_zip_dest_path: /tmp/groupedServerList.zip
-fastvpn_config_dest_dir: ~/Documents/fastvpn-configs/

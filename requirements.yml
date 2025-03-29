@@ -4,6 +4,7 @@ roles:
   - name: cloudalchemy.prometheus
   - name: cloudalchemy.grafana
   - name: cloudalchemy.node_exporter
+  - name: staticdev.pyenv
 
 collections:
   - name: geerlingguy.mac

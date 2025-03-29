@@ -1,12 +1,16 @@
 ---
-- name: Get specfic release address
+- name: Get specific release address
   retries: 3
   delay: 3
   ansible.builtin.set_fact:
     browser_download_url: "{{ result.json | to_json | from_json | community.general.json_query(browser_download_url_query) }}"
   vars:
-    browser_download_url_query: "assets[?contains(name,'{{ item.name }}')] | [?contains(name,'{{ item.os }}')] | [?contains(name,'{{ item.arch }}')].browser_download_url"
-    # browser_download_url_query: "assets[?name=='{{ item.name }}'].browser_download_url"
+    browser_download_url_query: >-
+      {% if item.remote_binary_name is defined and item.remote_binary_name %}
+      assets[?name=='{{ item.remote_binary_name }}'].browser_download_url
+      {% else %}
+      assets[?contains(name, '{{ item.name }}')] | [?contains(name, '{{ item.os }}')] | [?contains(name, '{{ item.arch }}')].browser_download_url
+      {% endif %}
 
 - name: Download GitHub release binary
   retries: 3

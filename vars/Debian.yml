@@ -30,9 +30,9 @@ apt_repos:
 
   - repo_debian_filename: kubernetes
     repo_desired_state: present
-    repo_debian: deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
-    gpg_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    gpg_keyring_file: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+    repo_debian: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /
+    gpg_key: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
+    gpg_keyring_file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
   
   - repo_debian_filename: sublime-text
     repo_desired_state: present
@@ -62,6 +62,8 @@ apt_installed_packages:
   - btop
   - certbot
   - curl
+  - libcurl4-openssl-dev
+  - libssl-dev
   
   # DOCKER start
   - docker-ce
@@ -83,8 +85,6 @@ apt_installed_packages:
   - gpg
   - guake
   - kubectl
-  - libmysqlclient-dev
-  - libmariadb-dev
   - libnss3-tools
   - jq
   - make
@@ -92,8 +92,9 @@ apt_installed_packages:
   - packer
   - pinta
   - python-is-python3
-  - python3.10-venv
+  - python3-virtualenv
   - python3-dev
+  - python3-pip
   - sublime-text
   - telepresence
   - terminator
@@ -101,6 +102,7 @@ apt_installed_packages:
   - unzip
   - vagrant
   - vault
+  - virtualenvwrapper
   - vim
   - vlc
   - yamllint
@@ -112,6 +114,8 @@ apt_installed_packages:
 
 
 snap_installed_packages:
+  - name: code
+    classic: true
   - name: dbeaver-ce
     classic: true
   - name: gitkraken
@@ -120,14 +124,10 @@ snap_installed_packages:
     classic: false
   - name: go
     classic: true
-    channel: 1.19/stable
+    channel: latest/stable
   - name: kubectx
     classic: true
-  - name: notion-snap
-    classic: false
   - name: postman
-    classic: false
-  - name: skype
     classic: false
   - name: slack
     classic: false
@@ -151,13 +151,15 @@ github_releases:
     arch: amd64
     destination: /usr/local/bin/kubebuilder
     type: binary
+    remote_binary_name: kubebuilder_linux_amd64
 
-  - repo: wercker/stern
+  - repo: stern/stern
     name: stern
     os: linux
     arch: amd64
     destination: /usr/local/bin/stern
-    type: binary
+    type: tar.gz
+    binary_location: stern
 
   - repo: FiloSottile/mkcert
     name: mkcert
@@ -227,8 +229,8 @@ github_releases:
     type: tar.gz
     binary_location: dive
 
-python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.venv"
-python_virtual_env_python: "{{ python_virtual_envs_folder }}/python"
+python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.pyenv/versions"
+python_virtual_env_python: "{{ python_virtual_envs_folder }}/latest_v312"
 python_virtual_env_pip_packages:
   - docker
   - gitman
