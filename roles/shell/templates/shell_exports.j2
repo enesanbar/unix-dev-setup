@@ -58,24 +58,18 @@ if [ $commands[flux] ]; then source <(flux completion zsh); fi
 if [ $commands[kubebuilder] ]; then source <(kubebuilder completion zsh); fi
 if [ $commands[stern] ]; then source <(stern --completion=zsh); fi
 
-## Virtualenv wrapper
-export WORKON_HOME="{{ python_virtual_envs_folder }}"
-#export PROJECT_HOME=$HOME/workspace
-#export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
-#export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+# Python / uv
+export PATH="{{ python_uv_tool_venv_path }}/bin:${HOME}/.local/bin:${PATH}"
 
-{% if ansible_facts['os_family'] == 'Debian' %}
-source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-{% elif ansible_facts['os_family'] == 'Darwin' %}
-source /opt/homebrew/bin/virtualenvwrapper.sh
-{% endif %}
-
-# setup virtualenv to work on the python at ~/.env/python
-# TODO: create virtualenv named python if not exists
-workon latest_v312
-
-# Python autocomplete
-if [ $commands[register-python-argcomplete] ]; then source <(register-python-argcomplete pytest); fi
+# pyenv / virtualenvwrapper (disabled for now, kept for reference)
+# export WORKON_HOME="$HOME/.pyenv/versions"
+# source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+# workon latest_v312
+# if [ $commands[register-python-argcomplete] ]; then source <(register-python-argcomplete pytest); fi
+#
+# uv equivalents:
+# uv python install {{ python_uv_default_python }}
+# uv venv {{ python_uv_tool_venv_path }} --python {{ python_uv_default_python }}
 
 # Python environment
 export PYTHONSTARTUP={{ python_startup_file_location }}

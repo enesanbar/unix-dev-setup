@@ -55,6 +55,7 @@ homebrew_installed_packages:
   - nvm
   - openstackclient
   - pyenv
+  - uv
   - python-yq
   - rs/tap/curlie
   - skaffold
@@ -121,9 +122,14 @@ homebrew_cask_apps:
   - whatsapp
   - zoom
 
-python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.venv"
-python_virtual_env_python: "{{ python_virtual_envs_folder }}/python"
-python_virtual_env_pip_packages:
+python_uv_python_versions:
+  - 3.14.5
+  - 3.13.13
+  - 3.12.1
+  - 3.10.8
+python_uv_default_python: "3.14.5"
+python_uv_tool_venv_path: "{{ ansible_facts['env']['HOME'] }}/.venvs/python"
+python_uv_tool_packages:
   - docker
   - gitman
   - psutil

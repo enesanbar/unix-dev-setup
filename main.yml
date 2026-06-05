@@ -23,7 +23,6 @@
         - cloudalchemy.prometheus
         - cloudalchemy.grafana
         - cloudalchemy.node_exporter
-        - staticdev.pyenv
       register: galaxy_role_dependencies
       tags: [bootstrap]
 

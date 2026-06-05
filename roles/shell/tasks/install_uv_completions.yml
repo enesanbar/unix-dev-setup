@@ -1,0 +1,17 @@
+---
+- name: Generate uv zsh completions
+  become: false
+  ansible.builtin.command:
+    argv:
+      - uv
+      - generate-shell-completion
+      - zsh
+  register: uv_zsh_completion
+  changed_when: false
+
+- name: Install uv zsh completions
+  become: false
+  ansible.builtin.copy:
+    content: "{{ uv_zsh_completion.stdout }}"
+    dest: "{{ zsh_completions_path }}/_uv"
+    mode: "0644"

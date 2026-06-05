@@ -11,6 +11,9 @@
   import_tasks: install_kubectx_completions.yml
   when: ansible_facts['os_family'] == "Debian"
 
+- name: Install uv zsh completions
+  import_tasks: install_uv_completions.yml
+
 - name: Copy rc files
   ansible.builtin.copy:
     src: "{{ item.src }}"

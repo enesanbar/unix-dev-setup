@@ -192,6 +192,24 @@ artifact_installs:
     destination: /usr/local/bin/dive
     mode: "0755"
 
+  - name: uv
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/astral-sh/uv/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='uv-x86_64-unknown-linux-gnu.tar.gz'].browser_download_url | [0]"
+    binary:
+      name: uv
+    install:
+      type: bundle
+      directory: /opt/uv
+      links:
+        - source: uv
+          destination: /usr/local/bin/uv
+        - source: uvx
+          destination: /usr/local/bin/uvx
+
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2
@@ -278,9 +296,14 @@ snap_installed_packages:
     classic: false
   - name: trello-desktop
     classic: false
-python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.pyenv/versions"
-python_virtual_env_python: "{{ python_virtual_envs_folder }}/latest_v312"
-python_virtual_env_pip_packages:
+python_uv_python_versions:
+  - 3.14.5
+  - 3.13.13
+  - 3.12.1
+  - 3.10.8
+python_uv_default_python: "3.14.5"
+python_uv_tool_venv_path: "{{ ansible_facts['env']['HOME'] }}/.venvs/python"
+python_uv_tool_packages:
   - docker
   - gitman
   - psutil
