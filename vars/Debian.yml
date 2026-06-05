@@ -43,6 +43,23 @@ apt_repos:
     gpg_key: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
     gpg_keyring_file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
+artifact_installs:
+  - name: jetbrains-toolbox
+    become: true
+    source:
+      type: archive
+      metadata_url: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
+      version_query: "TBA[0].build"
+      download_url_query: "TBA[0].downloads.linux.link"
+    binary:
+      name: jetbrains-toolbox
+    install:
+      type: bundle
+      directory: /opt/jetbrains-toolbox
+      links:
+        - source: bin/jetbrains-toolbox
+          destination: /usr/local/bin/jetbrains-toolbox
+
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2

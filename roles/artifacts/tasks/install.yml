@@ -1,0 +1,195 @@
+---
+- name: Resolve artifact metadata
+  ansible.builtin.uri:
+    url: "{{ artifact.source.metadata_url }}"
+    method: GET
+    return_content: yes
+    status_code: 200
+    body_format: json
+  register: artifact_metadata
+  retries: 10
+  delay: 3
+  when: artifact.source.metadata_url is defined
+
+- name: Set artifact source details
+  ansible.builtin.set_fact:
+    artifact_download_url: "{{ (artifact_metadata.json | to_json | from_json | community.general.json_query(artifact.source.download_url_query)) if artifact.source.metadata_url is defined else artifact.source.url }}"
+    artifact_version: "{{ (artifact_metadata.json | to_json | from_json | community.general.json_query(artifact.source.version_query)) if (artifact.source.metadata_url is defined and artifact.source.version_query is defined) else artifact.source.version | default('current') }}"
+
+- name: Set artifact download filename
+  ansible.builtin.set_fact:
+    artifact_download_filename: "{{ (artifact_download_url | regex_replace('\\?.*$', '')) | basename }}"
+    artifact_install_type: "{{ artifact.install.type | default('binary') }}"
+
+- name: Assert artifact source details are valid
+  ansible.builtin.assert:
+    that:
+      - artifact_download_url | length > 0
+      - artifact.source.type in ['archive', 'binary']
+      - artifact_install_type in ['binary', 'bundle']
+    fail_msg: "Artifact {{ artifact.name }} is missing a valid download URL or source type."
+
+- name: Ensure artifact working directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ artifact_install_root }}"
+    - "{{ artifact_install_root }}/downloads"
+    - "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}"
+
+- name: Download artifact payload
+  ansible.builtin.get_url:
+    url: "{{ artifact_download_url }}"
+    dest: "{{ artifact_install_root }}/downloads/{{ artifact_download_filename }}"
+    mode: "0644"
+    force: true
+  register: artifact_download
+
+- name: Check artifact extraction marker
+  ansible.builtin.stat:
+    path: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}/.extract-complete"
+  register: artifact_extract_marker
+  when: artifact.source.type == 'archive'
+
+- name: Extract artifact payload
+  ansible.builtin.unarchive:
+    src: "{{ artifact_download.dest }}"
+    dest: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}"
+    remote_src: yes
+  when:
+    - artifact.source.type == 'archive'
+    - not artifact_extract_marker.stat.exists
+
+- name: Mark artifact payload as extracted
+  ansible.builtin.file:
+    path: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}/.extract-complete"
+    state: touch
+    mode: "0644"
+  when:
+    - artifact.source.type == 'archive'
+    - not artifact_extract_marker.stat.exists
+
+- name: Find installed artifact binary in extracted payload
+  ansible.builtin.find:
+    paths: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}"
+    patterns: "{{ artifact.binary.name }}"
+    recurse: yes
+    file_type: file
+  register: artifact_binary_candidates
+  when: artifact.source.type == 'archive'
+
+- name: Assert extracted artifact binary was found
+  ansible.builtin.assert:
+    that:
+      - artifact_binary_candidates.matched == 1
+    fail_msg: "Expected exactly one {{ artifact.binary.name }} binary for {{ artifact.name }}, found {{ artifact_binary_candidates.matched }}."
+  when: artifact.source.type == 'archive'
+
+- name: Set artifact binary source path
+  ansible.builtin.set_fact:
+    artifact_binary_source: "{{ artifact_binary_candidates.files[0].path }}"
+  when: artifact.source.type == 'archive'
+
+- name: Set direct artifact binary source path
+  ansible.builtin.set_fact:
+    artifact_binary_source: "{{ artifact_download.dest }}"
+  when: artifact.source.type == 'binary'
+
+- name: Find extracted artifact bundle root
+  ansible.builtin.find:
+    paths: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}"
+    recurse: false
+    file_type: directory
+  register: artifact_bundle_roots
+  when:
+    - artifact.source.type == 'archive'
+    - artifact_install_type == 'bundle'
+
+- name: Assert extracted artifact bundle root was found
+  ansible.builtin.assert:
+    that:
+      - artifact_bundle_roots.matched == 1
+    fail_msg: "Expected exactly one extracted bundle root for {{ artifact.name }}, found {{ artifact_bundle_roots.matched }}."
+  when:
+    - artifact.source.type == 'archive'
+    - artifact_install_type == 'bundle'
+
+- name: Set artifact bundle source path
+  ansible.builtin.set_fact:
+    artifact_bundle_source: "{{ artifact_bundle_roots.files[0].path }}"
+  when:
+    - artifact.source.type == 'archive'
+    - artifact_install_type == 'bundle'
+
+- name: Ensure artifact binary destination directory exists
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.file:
+    path: "{{ artifact.destination | dirname }}"
+    state: directory
+    mode: "0755"
+  when: artifact_install_type == 'binary'
+
+- name: Install artifact binary
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.copy:
+    remote_src: yes
+    src: "{{ artifact_binary_source }}"
+    dest: "{{ artifact.destination }}"
+    mode: "{{ artifact.mode | default('0755') }}"
+  when: artifact_install_type == 'binary'
+
+- name: Ensure artifact bundle parent directory exists
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.file:
+    path: "{{ artifact.install.directory | dirname }}"
+    state: directory
+    mode: "0755"
+  when: artifact_install_type == 'bundle'
+
+- name: Reset artifact bundle directory
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.file:
+    path: "{{ artifact.install.directory }}"
+    state: absent
+  when: artifact_install_type == 'bundle'
+
+- name: Ensure artifact bundle directory exists
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.file:
+    path: "{{ artifact.install.directory }}"
+    state: directory
+    mode: "0755"
+  when: artifact_install_type == 'bundle'
+
+- name: Install artifact bundle contents
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.copy:
+    remote_src: yes
+    src: "{{ artifact_bundle_source }}/"
+    dest: "{{ artifact.install.directory }}/"
+  when: artifact_install_type == 'bundle'
+
+- name: Ensure artifact link directories exist
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.file:
+    path: "{{ artifact_link.destination | dirname }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ artifact.install.links | default([]) }}"
+  loop_control:
+    loop_var: artifact_link
+  when: artifact_install_type == 'bundle'
+
+- name: Link artifact bundle launchers
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.file:
+    src: "{{ artifact.install.directory }}/{{ artifact_link.source }}"
+    dest: "{{ artifact_link.destination }}"
+    state: link
+    force: true
+  loop: "{{ artifact.install.links | default([]) }}"
+  loop_control:
+    loop_var: artifact_link
+  when: artifact_install_type == 'bundle'

@@ -70,6 +70,10 @@
     channel: "{{ item.channel | default('stable') }}"
   with_items: "{{ snap_installed_packages }}"
 
+- name: Install artifact-based tools
+  ansible.builtin.include_role:
+    name: artifacts
+
 - name: Ensure group "docker" exists
   ansible.builtin.group:
     name: docker
