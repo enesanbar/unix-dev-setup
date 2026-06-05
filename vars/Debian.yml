@@ -60,6 +60,138 @@ artifact_installs:
         - source: bin/jetbrains-toolbox
           destination: /usr/local/bin/jetbrains-toolbox
 
+  - name: kind
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/kubernetes-sigs/kind/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'kind-linux-amd64')].browser_download_url | [0]"
+    destination: /usr/local/bin/kind
+    mode: "0755"
+
+  - name: kubebuilder
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/kubernetes-sigs/kubebuilder/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='kubebuilder_linux_amd64'].browser_download_url | [0]"
+    destination: /usr/local/bin/kubebuilder
+    mode: "0755"
+
+  - name: stern
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/stern/stern/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'stern_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: stern
+    destination: /usr/local/bin/stern
+    mode: "0755"
+
+  - name: mkcert
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/FiloSottile/mkcert/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'mkcert') && contains(name, 'linux-amd64')].browser_download_url | [0]"
+    destination: /usr/local/bin/mkcert
+    mode: "0755"
+
+  - name: kubeseal
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/bitnami-labs/sealed-secrets/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'kubeseal-') && ends_with(name, 'linux-amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: kubeseal
+    destination: /usr/local/bin/kubeseal
+    mode: "0755"
+
+  - name: terragrunt
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='terragrunt_linux_amd64'].browser_download_url | [0]"
+    destination: /usr/local/bin/terragrunt
+    mode: "0755"
+
+  - name: argocd
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/argoproj/argo-cd/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='argocd-linux-amd64'].browser_download_url | [0]"
+    destination: /usr/local/bin/argocd
+    mode: "0755"
+
+  - name: sops
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/mozilla/sops/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'sops-v') && ends_with(name, '.linux.amd64')].browser_download_url | [0]"
+    destination: /usr/local/bin/sops
+    mode: "0755"
+
+  - name: vegeta
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/tsenart/vegeta/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'vegeta_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: vegeta
+    destination: /usr/local/bin/vegeta
+    mode: "0755"
+
+  - name: helm-docs
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/norwoodj/helm-docs/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'helm-docs_') && ends_with(name, 'Linux_x86_64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: helm-docs
+    destination: /usr/local/bin/helm-docs
+    mode: "0755"
+
+  - name: chart-testing
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/helm/chart-testing/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'chart-testing_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: ct
+    destination: /usr/local/bin/ct
+    mode: "0755"
+
+  - name: dive
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/wagoodman/dive/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'dive_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: dive
+    destination: /usr/local/bin/dive
+    mode: "0755"
+
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2
@@ -146,100 +278,6 @@ snap_installed_packages:
     classic: false
   - name: trello-desktop
     classic: false
-
-
-github_releases:
-  - repo: kubernetes-sigs/kind
-    name: kind
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kind
-    type: binary
-
-  - repo: kubernetes-sigs/kubebuilder
-    name: kubebuilder
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kubebuilder
-    type: binary
-    remote_binary_name: kubebuilder_linux_amd64
-
-  - repo: stern/stern
-    name: stern
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/stern
-    type: tar.gz
-    binary_location: stern
-
-  - repo: FiloSottile/mkcert
-    name: mkcert
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/mkcert
-    type: binary
-
-  - repo: bitnami-labs/sealed-secrets
-    name: kubeseal
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kubeseal
-    type: tar.gz
-    binary_location: kubeseal
-
-  - repo: gruntwork-io/terragrunt
-    name: terragrunt
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/terragrunt
-    type: binary
-
-  - repo: argoproj/argo-cd
-    name: argocd
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/argocd
-    type: binary
-
-  - repo: mozilla/sops
-    name: sops
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/sops
-    type: binary
-
-  - repo: tsenart/vegeta
-    name: vegeta
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/vegeta
-    type: tar.gz
-    binary_location: vegeta
-
-  - repo: norwoodj/helm-docs
-    name: helm-docs
-    os: Linux
-    arch: x86_64
-    destination: /usr/local/bin/helm-docs
-    type: tar.gz
-    binary_location: helm-docs
-
-  - repo: helm/chart-testing
-    name: chart-testing
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/ct
-    type: tar.gz
-    binary_location: ct
-
-  - repo: wagoodman/dive
-    name: dive
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/dive
-    type: tar.gz
-    binary_location: dive
-
 python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.pyenv/versions"
 python_virtual_env_python: "{{ python_virtual_envs_folder }}/latest_v312"
 python_virtual_env_pip_packages:

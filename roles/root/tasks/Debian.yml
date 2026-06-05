@@ -58,10 +58,6 @@
   notify:
     - Restart network manager
 
-# - include_role:
-#     name: github-releases
-#   with_items: "{{ github_releases }}"
-
 - name: Install snap packages
   become: true
   community.general.snap:

@@ -7,5 +7,7 @@
 	autocrlf = input
 [color]
     ui = auto
+{% if gitconfig_use_github_ssh_instead_of_https %}
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+{% endif %}
