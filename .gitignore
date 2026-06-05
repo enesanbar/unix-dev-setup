@@ -6,6 +6,7 @@ gen
 
 ### Ansible template
 *.retry
+.ansible/
 
 ### macOS template
 # General
@@ -34,4 +35,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-

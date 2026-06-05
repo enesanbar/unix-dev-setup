@@ -3,7 +3,7 @@
 
 - name: Import keyboard.yml
   include_tasks: "{{ item }}"
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
   with_items:
     - keyboard.yml
     - dock.yml

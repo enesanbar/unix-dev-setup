@@ -1,20 +1,52 @@
 ---
+- name: Debian/Ubuntu Family | Ensure apt keyring directories exist
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item.gpg_keyring_file | dirname }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ apt_repos }}"
+
 - name: Debian/Ubuntu Family | Add gpg signing keys
   become: yes
-  apt_key:
+  ansible.builtin.get_url:
     url: "{{ item.gpg_key }}"
-    state: present
-    keyring: "{{ item.gpg_keyring_file }}"
-  with_items: "{{ apt_repos }}"
+    dest: "{{ item.gpg_keyring_file }}.asc"
+    mode: "0644"
+    force: true
+  loop: "{{ apt_repos }}"
+  register: apt_repo_key_downloads
+
+- name: Debian/Ubuntu Family | Dearmor gpg signing keys
+  become: yes
+  ansible.builtin.command:
+    argv:
+      - gpg
+      - --batch
+      - --yes
+      - --dearmor
+      - --output
+      - "{{ downloaded_key.item.gpg_keyring_file }}"
+      - "{{ downloaded_key.item.gpg_keyring_file }}.asc"
+  loop: "{{ apt_repo_key_downloads.results }}"
+  loop_control:
+    loop_var: downloaded_key
+  changed_when: downloaded_key.changed
 
 - name: Debian/Ubuntu Family | Adding apt repositories
   become: yes
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ item.repo_debian }}"
     state: "{{ item.repo_desired_state }}"
     filename: "{{ item.repo_debian_filename }}"
     update_cache: yes
   loop: "{{ apt_repos }}"
+
+- name: Debian/Ubuntu Family | Remove conflicting Docker packages
+  become: yes
+  ansible.builtin.apt:
+    name: "{{ docker_conflicting_packages }}"
+    state: absent
 
 - name: Install apt packages
   become: true

@@ -10,17 +10,35 @@
   retries: 10
   delay: 30
 
+- name: Set extracted JetBrains Toolbox path
+  ansible.builtin.set_fact:
+    jetbrains_extracted_path: "{{ jetbrains_config_zip_dest_path }}/{{ jetbrains_app_name }}-{{ result.json.TBA[0].build }}"
+
 - name: Extract jetbrains archive into tmp
   ansible.builtin.unarchive:
     src: "{{ result.json.TBA[0].downloads.linux.link }}"
     dest: /tmp
     remote_src: yes
-    creates: "{{ jetbrains_config_zip_dest_path }}/{{ jetbrains_app_name }}-{{ result.json.TBA[0].build }}"
+    creates: "{{ jetbrains_extracted_path }}"
+
+- name: Find JetBrains Toolbox binary
+  ansible.builtin.find:
+    paths: "{{ jetbrains_extracted_path }}"
+    patterns: "{{ jetbrains_app_name }}"
+    file_type: file
+    recurse: yes
+  register: jetbrains_binary
+
+- name: Assert JetBrains Toolbox binary was found
+  ansible.builtin.assert:
+    that:
+      - jetbrains_binary.matched == 1
+    fail_msg: "Expected exactly one {{ jetbrains_app_name }} binary under {{ jetbrains_extracted_path }}, found {{ jetbrains_binary.matched }}."
 
 - name: Move jetbrains binary to path
   become: yes
-  copy:
+  ansible.builtin.copy:
     remote_src: yes
-    src: "{{ jetbrains_config_zip_dest_path }}/{{ jetbrains_app_name }}-{{ result.json.TBA[0].build }}/{{ jetbrains_app_name }}"
+    src: "{{ jetbrains_binary.files[0].path }}"
     dest: "/usr/local/bin/{{ jetbrains_app_name }}"
-    mode: '0777'
+    mode: '0755'

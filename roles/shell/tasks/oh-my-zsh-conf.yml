@@ -89,4 +89,4 @@
       dest: "{{ oh_my_zsh_path }}/completions/kubens.bash"
   loop_control:
     loop_var: completion_file
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"

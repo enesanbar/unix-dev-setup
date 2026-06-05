@@ -1,9 +1,83 @@
 ---
 - hosts: localhost
   connection: local
+  gather_facts: true
 
-  vars_files:
-    - "vars/{{ ansible_os_family }}.yml"
+  pre_tasks:
+    - name: Ensure local Ansible dependency directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ playbook_dir }}/.ansible"
+        - "{{ playbook_dir }}/.ansible/roles"
+        - "{{ playbook_dir }}/.ansible/collections"
+      tags: [bootstrap]
+
+    - name: Check local Galaxy role dependencies
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/.ansible/roles/{{ item }}"
+      loop:
+        - elliotweiser.osx-command-line-tools
+        - cloudalchemy.prometheus
+        - cloudalchemy.grafana
+        - cloudalchemy.node_exporter
+        - staticdev.pyenv
+      register: galaxy_role_dependencies
+      tags: [bootstrap]
+
+    - name: Install Galaxy role dependencies
+      ansible.builtin.command:
+        argv:
+          - ansible-galaxy
+          - role
+          - install
+          - -r
+          - "{{ playbook_dir }}/requirements.yml"
+          - --roles-path
+          - "{{ playbook_dir }}/.ansible/roles"
+      when: galaxy_role_dependencies.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+      changed_when: true
+      tags: [bootstrap]
+
+    - name: Check local Galaxy collection dependencies
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/.ansible/collections/ansible_collections/geerlingguy/mac"
+      register: galaxy_collection_dependency
+      tags: [bootstrap]
+
+    - name: Install Galaxy collection dependencies
+      ansible.builtin.command:
+        argv:
+          - ansible-galaxy
+          - collection
+          - install
+          - -r
+          - "{{ playbook_dir }}/requirements.yml"
+          - -p
+          - "{{ playbook_dir }}/.ansible/collections"
+      when: not galaxy_collection_dependency.stat.exists
+      changed_when: true
+      tags: [bootstrap]
+
+    - name: Check OS-specific vars file
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/vars/{{ ansible_facts.os_family }}.yml"
+      register: os_vars_file
+      tags: [bootstrap]
+
+    - name: Fail if OS family is unsupported
+      ansible.builtin.assert:
+        that:
+          - os_vars_file.stat.exists
+        fail_msg: "Unsupported OS family '{{ ansible_facts.os_family }}'. Add vars/{{ ansible_facts.os_family }}.yml before running this playbook."
+      tags: [bootstrap]
+
+    - name: Load OS-specific vars
+      ansible.builtin.include_vars:
+        file: "{{ os_vars_file.stat.path }}"
+      tags: [bootstrap]
 
   roles:
     - role: root

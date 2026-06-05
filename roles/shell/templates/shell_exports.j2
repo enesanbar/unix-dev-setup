@@ -32,9 +32,9 @@ BULLETTRAIN_PROMPT_ORDER=(
     cmd_exec_time
 )
 
-{% if ansible_os_family == 'Debian' %}
+{% if ansible_facts['os_family'] == 'Debian' %}
 export BULLETTRAIN_KCTX_KCONFIG=/home/enesanbar/.kube/config
-{% elif ansible_os_family == 'Darwin' %}
+{% elif ansible_facts['os_family'] == 'Darwin' %}
 export BULLETTRAIN_KCTX_KCONFIG=/Users/enesanbar/.kube/config
 {% endif %}
 
@@ -64,9 +64,9 @@ export WORKON_HOME="{{ python_virtual_envs_folder }}"
 #export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
 #export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
 
-{% if ansible_os_family == 'Debian' %}
+{% if ansible_facts['os_family'] == 'Debian' %}
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-{% elif ansible_os_family == 'Darwin' %}
+{% elif ansible_facts['os_family'] == 'Darwin' %}
 source /opt/homebrew/bin/virtualenvwrapper.sh
 {% endif %}
 
@@ -80,9 +80,9 @@ if [ $commands[register-python-argcomplete] ]; then source <(register-python-arg
 # Python environment
 export PYTHONSTARTUP={{ python_startup_file_location }}
 
-{% if ansible_os_family == 'Debian' %}
+{% if ansible_facts['os_family'] == 'Debian' %}
 complete -o nospace -C /usr/bin/terraform terraform
-{% elif ansible_os_family == 'Darwin' %}
+{% elif ansible_facts['os_family'] == 'Darwin' %}
 FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 {% endif %}

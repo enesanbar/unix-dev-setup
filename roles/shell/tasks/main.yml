@@ -5,11 +5,11 @@
 
 - name: Import install_debian.yml if OS family is Debian
   import_tasks: install_debian.yml
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 - name: Import install_debian.yml if OS family is Debian
   import_tasks: install_kubectx_completions.yml
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 - name: Copy rc files
   ansible.builtin.copy:

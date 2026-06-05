@@ -5,10 +5,10 @@
   when: debug is defined
 
 - import_tasks: MacOS.yml
-  when: ansible_os_family == 'Darwin'
+  when: ansible_facts['os_family'] == 'Darwin'
 
 - import_tasks: Debian.yml
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
 
 
 - include_role:
