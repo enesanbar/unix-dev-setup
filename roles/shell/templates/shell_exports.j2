@@ -14,7 +14,30 @@ export MANPAGER="less -X"
 export PAGER='less'
 
 # Bullet-Train Theme Configuration
+BULLETTRAIN_PROMPT_ORDER=(
+    status
+    custom
+    context
+    dir
+    screen
+    perl
+    ruby
+    virtualenv
+    aws
+    go
+    kctx
+    rust
+    elixir
+    hg
+    cmd_exec_time
+)
+
+{% if ansible_os_family == 'Debian' %}
+export BULLETTRAIN_KCTX_KCONFIG=/home/enesanbar/.kube/config
+{% elif ansible_os_family == 'Darwin' %}
 export BULLETTRAIN_KCTX_KCONFIG=/Users/enesanbar/.kube/config
+{% endif %}
+
 export BULLETTRAIN_KCTX_BG=blue
 export BULLETTRAIN_KCTX_KUBECTL=true
 export BULLETTRAIN_VIRTUALENV_BG=red
@@ -40,7 +63,12 @@ export WORKON_HOME="{{ python_virtual_envs_folder }}"
 #export PROJECT_HOME=$HOME/workspace
 #export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
 #export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-source /usr/local/bin/virtualenvwrapper.sh
+
+{% if ansible_os_family == 'Debian' %}
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+{% elif ansible_os_family == 'Darwin' %}
+source /opt/homebrew/bin/virtualenvwrapper.sh
+{% endif %}
 
 # setup virtualenv to work on the python at ~/.env/python
 # TODO: create virtualenv named python if not exists
@@ -52,9 +80,12 @@ if [ $commands[register-python-argcomplete] ]; then source <(register-python-arg
 # Python environment
 export PYTHONSTARTUP={{ python_startup_file_location }}
 
-# Terraform
-autoload -U +X bashcompinit && bashcompinit
+{% if ansible_os_family == 'Debian' %}
 complete -o nospace -C /usr/bin/terraform terraform
+{% elif ansible_os_family == 'Darwin' %}
+FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+complete -o nospace -C /opt/homebrew/bin/terraform terraform
+{% endif %}
 
 # AWS
 export AWS_PROFILE=default

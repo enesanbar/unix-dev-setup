@@ -1,15 +1,19 @@
 ---
 homebrew_installed_packages:
+  - act # run github actions locally
+  - age
   - ansible-lint
   - awscli
   - aws-shell
   - azure-cli
   - bat # cat syntax highlighting
+  - bash
   - btop
   - certbot
   - coreutils
   - cowsay
   - checkov # a static code analysis tool for scanning IaC files
+  - datawire/blackbird/telepresence-arm64
   - dive
   - dust # improved du
   - duf # improved df
@@ -27,7 +31,7 @@ homebrew_installed_packages:
   - gping # ping, but with a graph.
   - graphviz
   - hashicorp/tap/packer
-  - hashicorp/tap/terraform
+#  - hashicorp/tap/terraform
   - hashicorp/tap/vault
   - helm
   - htop
@@ -36,25 +40,35 @@ homebrew_installed_packages:
   - k9s
   - kind
   - kops
+  - kubebuilder
+  - kubeconform
   - kubectx
   - kubernetes-cli
   - kubeseal
+  - kubespy
   - kustomize
   - minikube
   - mkcert
+  - mockery
+  - ngrok
   - node
   - nvm
   - openstackclient
+  - pyenv
   - python-yq
   - rs/tap/curlie
   - skaffold
   - sonar-scanner
+  - sops
   - speedtest-cli
+  - stern
   - terragrunt
   - tflint # A Pluggable Terraform Linter
   - tree
   - unzip
   - vegeta
+  - virtualenv
+  - virtualenvwrapper
   - yamllint
   - yarn
   - watch
@@ -93,6 +107,7 @@ homebrew_cask_apps:
   - robo-3t
   - sequel-pro
   - skype
+  - slack
   - sourcetree
   - spectacle
   - sublime-text
@@ -100,8 +115,17 @@ homebrew_cask_apps:
   - switchhosts
   - telegram
   - vagrant
-  - virtualbox
+#  - virtualbox
   - visual-studio-code
   - vlc
   - whatsapp
   - zoom
+
+python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.venv"
+python_virtual_env_python: "{{ python_virtual_envs_folder }}/python"
+python_virtual_env_pip_packages:
+  - docker
+  - gitman
+  - psutil
+  - pytest
+  - refurb
