@@ -1,0 +1,47 @@
+---
+- name: Install default Volta Node runtime
+  ansible.builtin.command:
+    argv:
+      - "{{ node_volta_command }}"
+      - install
+      - "{{ node_volta_default_node }}"
+  environment:
+    VOLTA_HOME: "{{ node_volta_home }}"
+    PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  changed_when: false
+
+- name: Fetch additional Volta Node runtimes
+  ansible.builtin.command:
+    argv:
+      - "{{ node_volta_command }}"
+      - fetch
+      - "{{ item }}"
+  environment:
+    VOLTA_HOME: "{{ node_volta_home }}"
+    PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  loop: "{{ node_volta_extra_nodes }}"
+  changed_when: false
+
+- name: Locate default Volta Node binary
+  ansible.builtin.command:
+    argv:
+      - "{{ node_volta_command }}"
+      - which
+      - node
+  environment:
+    VOLTA_HOME: "{{ node_volta_home }}"
+    PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  register: volta_default_node_path
+  changed_when: false
+
+- name: Enable Corepack shims in Volta home
+  ansible.builtin.command:
+    argv:
+      - "{{ volta_default_node_path.stdout | dirname }}/corepack"
+      - enable
+      - --install-directory
+      - "{{ node_volta_home }}/bin"
+  environment:
+    VOLTA_HOME: "{{ node_volta_home }}"
+    PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  changed_when: false

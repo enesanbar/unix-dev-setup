@@ -14,7 +14,7 @@
 - include_role:
     name: "{{ item }}"
   loop:
+    - node
     - shell
     - python
     - gnome
-    - monitoring

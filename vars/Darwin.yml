@@ -51,11 +51,10 @@ homebrew_installed_packages:
   - mkcert
   - mockery
   - ngrok
-  - node
-  - nvm
   - openstackclient
   - pyenv
   - uv
+  - volta
   - python-yq
   - rs/tap/curlie
   - skaffold
@@ -71,7 +70,6 @@ homebrew_installed_packages:
   - virtualenv
   - virtualenvwrapper
   - yamllint
-  - yarn
   - watch
   - weaveworks/tap/eksctl
   - wget
@@ -135,3 +133,9 @@ python_uv_tool_packages:
   - psutil
   - pytest
   - refurb
+
+node_volta_home: "{{ ansible_facts['env']['HOME'] }}/.volta"
+node_volta_command: "volta"
+node_volta_default_node: "node@lts"
+node_volta_extra_nodes:
+  - "node@latest"

@@ -49,7 +49,8 @@ BULLETTRAIN_EXEC_TIME_ELAPSED=1
 
 # Go lang
 export GOPATH="${HOME}/go"
-export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
+export VOLTA_HOME="{{ node_volta_home }}"
+export PATH="${VOLTA_HOME}/bin:{{ python_uv_tool_venv_path }}/bin:${HOME}/.local/bin:${PATH}:${GOPATH}/bin:${GOROOT}/bin"
 
 # Kubectl autocompletion
 if [ $commands[kubectl] ]; then source <(kubectl completion zsh); fi
@@ -57,9 +58,6 @@ if [ $commands[helm] ]; then source <(helm completion zsh); fi
 if [ $commands[flux] ]; then source <(flux completion zsh); fi
 if [ $commands[kubebuilder] ]; then source <(kubebuilder completion zsh); fi
 if [ $commands[stern] ]; then source <(stern --completion=zsh); fi
-
-# Python / uv
-export PATH="{{ python_uv_tool_venv_path }}/bin:${HOME}/.local/bin:${PATH}"
 
 # pyenv / virtualenvwrapper (disabled for now, kept for reference)
 # export WORKON_HOME="$HOME/.pyenv/versions"
@@ -70,6 +68,10 @@ export PATH="{{ python_uv_tool_venv_path }}/bin:${HOME}/.local/bin:${PATH}"
 # uv equivalents:
 # uv python install {{ python_uv_default_python }}
 # uv venv {{ python_uv_tool_venv_path }} --python {{ python_uv_default_python }}
+
+# Node / Volta
+# volta install node@lts
+# volta fetch node@latest
 
 # Python environment
 export PYTHONSTARTUP={{ python_startup_file_location }}

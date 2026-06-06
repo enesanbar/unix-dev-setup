@@ -20,9 +20,6 @@
         path: "{{ playbook_dir }}/.ansible/roles/{{ item }}"
       loop:
         - elliotweiser.osx-command-line-tools
-        - cloudalchemy.prometheus
-        - cloudalchemy.grafana
-        - cloudalchemy.node_exporter
       register: galaxy_role_dependencies
       tags: [bootstrap]
 

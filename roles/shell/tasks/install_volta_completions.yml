@@ -1,0 +1,20 @@
+---
+- name: Generate Volta zsh completions
+  become: false
+  ansible.builtin.command:
+    argv:
+      - "{{ node_volta_command }}"
+      - completions
+      - zsh
+  environment:
+    VOLTA_HOME: "{{ node_volta_home }}"
+    PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  register: volta_zsh_completion
+  changed_when: false
+
+- name: Install Volta zsh completions
+  become: false
+  ansible.builtin.copy:
+    content: "{{ volta_zsh_completion.stdout }}"
+    dest: "{{ zsh_completions_path }}/_volta"
+    mode: "0644"

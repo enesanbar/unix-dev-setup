@@ -30,7 +30,7 @@ apt_repos:
     repo_debian: deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main
     gpg_key: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
     gpg_keyring_file: /usr/share/keyrings/helm.gpg
-    
+
   - repo_debian_filename: google
     repo_desired_state: present
     repo_debian: deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main
@@ -55,6 +55,7 @@ artifact_installs:
       name: jetbrains-toolbox
     install:
       type: bundle
+      reset: true
       directory: /opt/jetbrains-toolbox
       links:
         - source: bin/jetbrains-toolbox
@@ -203,6 +204,7 @@ artifact_installs:
       name: uv
     install:
       type: bundle
+      reset: true
       directory: /opt/uv
       links:
         - source: uv
@@ -210,12 +212,24 @@ artifact_installs:
         - source: uvx
           destination: /usr/local/bin/uvx
 
+  - name: volta
+    become: false
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/volta-cli/volta/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?ends_with(name, 'linux.tar.gz')].browser_download_url | [0]"
+    install:
+      type: bundle
+      content_root: "."
+      directory: "{{ node_volta_home }}/bin"
+
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2
   - libxi6
   - libxrender1
-  - libxtst6 
+  - libxtst6
   - mesa-utils
   - libfontconfig
   - libgtk-3-bin
@@ -277,6 +291,8 @@ apt_installed_packages:
 snap_installed_packages:
   - name: code
     classic: true
+  - name: ghostty
+    classic: true
   - name: dbeaver-ce
     classic: true
   - name: gitkraken
@@ -309,3 +325,9 @@ python_uv_tool_packages:
   - psutil
   - pytest
   - refurb
+
+node_volta_home: "{{ ansible_facts['env']['HOME'] }}/.volta"
+node_volta_command: "{{ node_volta_home }}/bin/volta"
+node_volta_default_node: "node@lts"
+node_volta_extra_nodes:
+  - "node@latest"

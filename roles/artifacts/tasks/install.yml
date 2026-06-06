@@ -20,6 +20,7 @@
   ansible.builtin.set_fact:
     artifact_download_filename: "{{ (artifact_download_url | regex_replace('\\?.*$', '')) | basename }}"
     artifact_install_type: "{{ artifact.install.type | default('binary') }}"
+    artifact_install_reset: "{{ artifact.install.reset | default(false) }}"
 
 - name: Assert artifact source details are valid
   ansible.builtin.assert:
@@ -78,24 +79,38 @@
     recurse: yes
     file_type: file
   register: artifact_binary_candidates
-  when: artifact.source.type == 'archive'
+  when:
+    - artifact.source.type == 'archive'
+    - artifact.binary is defined
 
 - name: Assert extracted artifact binary was found
   ansible.builtin.assert:
     that:
       - artifact_binary_candidates.matched == 1
     fail_msg: "Expected exactly one {{ artifact.binary.name }} binary for {{ artifact.name }}, found {{ artifact_binary_candidates.matched }}."
-  when: artifact.source.type == 'archive'
+  when:
+    - artifact.source.type == 'archive'
+    - artifact.binary is defined
 
 - name: Set artifact binary source path
   ansible.builtin.set_fact:
     artifact_binary_source: "{{ artifact_binary_candidates.files[0].path }}"
-  when: artifact.source.type == 'archive'
+  when:
+    - artifact.source.type == 'archive'
+    - artifact.binary is defined
 
 - name: Set direct artifact binary source path
   ansible.builtin.set_fact:
     artifact_binary_source: "{{ artifact_download.dest }}"
   when: artifact.source.type == 'binary'
+
+- name: Set explicit artifact bundle source path
+  ansible.builtin.set_fact:
+    artifact_bundle_source: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}/{{ artifact.install.content_root }}"
+  when:
+    - artifact.source.type == 'archive'
+    - artifact_install_type == 'bundle'
+    - artifact.install.content_root is defined
 
 - name: Find extracted artifact bundle root
   ansible.builtin.find:
@@ -106,6 +121,7 @@
   when:
     - artifact.source.type == 'archive'
     - artifact_install_type == 'bundle'
+    - artifact.install.content_root is not defined
 
 - name: Assert extracted artifact bundle root was found
   ansible.builtin.assert:
@@ -115,6 +131,7 @@
   when:
     - artifact.source.type == 'archive'
     - artifact_install_type == 'bundle'
+    - artifact.install.content_root is not defined
 
 - name: Set artifact bundle source path
   ansible.builtin.set_fact:
@@ -122,6 +139,7 @@
   when:
     - artifact.source.type == 'archive'
     - artifact_install_type == 'bundle'
+    - artifact.install.content_root is not defined
 
 - name: Ensure artifact binary destination directory exists
   become: "{{ artifact.become | default(true) }}"
@@ -153,7 +171,9 @@
   ansible.builtin.file:
     path: "{{ artifact.install.directory }}"
     state: absent
-  when: artifact_install_type == 'bundle'
+  when:
+    - artifact_install_type == 'bundle'
+    - artifact_install_reset
 
 - name: Ensure artifact bundle directory exists
   become: "{{ artifact.become | default(true) }}"

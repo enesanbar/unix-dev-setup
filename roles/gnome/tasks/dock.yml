@@ -46,8 +46,7 @@
           'org.gnome.Nautilus.desktop',
           'spotify_spotify.desktop',
           'postman_postman.desktop',
-          'code.desktop',
-          'terminator.desktop',
-          'trello-desktop_trello-desktop.desktop',
+          'code_code.desktop',
+          'ghostty_ghostty.desktop',
           'notion-snap_notion-snap.desktop'
         ]
