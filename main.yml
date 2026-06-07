@@ -61,19 +61,19 @@
       ansible.builtin.stat:
         path: "{{ playbook_dir }}/vars/{{ ansible_facts.os_family }}.yml"
       register: os_vars_file
-      tags: [bootstrap]
+      tags: [bootstrap, always]
 
     - name: Fail if OS family is unsupported
       ansible.builtin.assert:
         that:
           - os_vars_file.stat.exists
         fail_msg: "Unsupported OS family '{{ ansible_facts.os_family }}'. Add vars/{{ ansible_facts.os_family }}.yml before running this playbook."
-      tags: [bootstrap]
+      tags: [bootstrap, always]
 
     - name: Load OS-specific vars
       ansible.builtin.include_vars:
         file: "{{ os_vars_file.stat.path }}"
-      tags: [bootstrap]
+      tags: [bootstrap, always]
 
   roles:
     - role: root

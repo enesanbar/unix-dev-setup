@@ -43,14 +43,6 @@ apt_repos:
     gpg_key: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
     gpg_keyring_file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-  - repo_debian_filename: claude-code
-    repo_desired_state: present
-    repo_debian: >-
-      deb [signed-by=/etc/apt/keyrings/claude-code.gpg]
-      https://downloads.claude.ai/claude-code/apt/stable stable main
-    gpg_key: https://downloads.claude.ai/keys/claude-code.asc
-    gpg_keyring_file: /etc/apt/keyrings/claude-code.gpg
-
   - repo_debian_filename: cursor
     repo_desired_state: present
     repo_debian: >-
@@ -264,13 +256,6 @@ artifact_installs:
       directory: "{{ node_volta_home }}/bin"
 
 remote_script_installs:
-  - name: codex
-    become: true
-    interpreter: sh
-    url: https://chatgpt.com/codex/install.sh
-    environment:
-      CODEX_NON_INTERACTIVE: "1"
-
   - name: ollama
     become: true
     url: https://ollama.com/install.sh
@@ -293,7 +278,6 @@ apt_installed_packages:
   - curl
   - libcurl4-openssl-dev
   - libssl-dev
-  - claude-code
   
   # DOCKER start
   - docker-ce
