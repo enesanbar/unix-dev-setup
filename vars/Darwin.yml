@@ -25,6 +25,7 @@ homebrew_installed_packages:
   - git-flow
   - gnu-sed
   - gh
+  - gemini-cli
   - go
   - go-swagger
   - golangci-lint
@@ -51,6 +52,7 @@ homebrew_installed_packages:
   - mkcert
   - mockery
   - ngrok
+  - anomalyco/tap/opencode
   - openstackclient
   - pyenv
   - uv
@@ -84,9 +86,14 @@ homebrew_taps:
   - weaveworks/tap
   - git-chglog/git-chglog
   - go-swagger/go-swagger
+  - anomalyco/tap
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
+  - claude
+  - claude-code
+  - codex
+  - cursor
   - docker
   - drawio
   - fig # IDE-style autocomplete to terminal.
@@ -101,6 +108,8 @@ homebrew_cask_apps:
   - lyricsx
   - mysqlworkbench
   - notion
+  - ollama-app
+  - opencode-desktop
   - pgadmin4
   - postman
   - robo-3t
@@ -117,6 +126,7 @@ homebrew_cask_apps:
 #  - virtualbox
   - visual-studio-code
   - vlc
+  - warp
   - whatsapp
   - zoom
 
@@ -139,3 +149,5 @@ node_volta_command: "volta"
 node_volta_default_node: "node@lts"
 node_volta_extra_nodes:
   - "node@latest"
+node_npm_global_packages:
+  - "@github/copilot"

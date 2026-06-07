@@ -1,0 +1,6 @@
+---
+- name: Install generated zsh completions
+  ansible.builtin.include_tasks: install_generated_completion.yml
+  loop: "{{ shell_generated_completions | default([]) }}"
+  loop_control:
+    loop_var: shell_generated_completion

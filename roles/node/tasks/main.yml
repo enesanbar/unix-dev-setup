@@ -45,3 +45,17 @@
     VOLTA_HOME: "{{ node_volta_home }}"
     PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
   changed_when: false
+
+- name: Install global npm packages
+  become: false
+  community.general.npm:
+    name: "{{ node_npm_global_package }}"
+    global: true
+    state: latest
+    executable: "{{ node_volta_home }}/bin/npm"
+  environment:
+    VOLTA_HOME: "{{ node_volta_home }}"
+    PATH: "{{ node_volta_home }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  loop: "{{ node_npm_global_packages }}"
+  loop_control:
+    loop_var: node_npm_global_package

@@ -43,6 +43,33 @@ apt_repos:
     gpg_key: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
     gpg_keyring_file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
+  - repo_debian_filename: claude-code
+    repo_desired_state: present
+    repo_debian: >-
+      deb [signed-by=/etc/apt/keyrings/claude-code.gpg]
+      https://downloads.claude.ai/claude-code/apt/stable stable main
+    gpg_key: https://downloads.claude.ai/keys/claude-code.asc
+    gpg_keyring_file: /etc/apt/keyrings/claude-code.gpg
+
+  - repo_debian_filename: cursor
+    repo_desired_state: present
+    repo_debian: >-
+      deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg]
+      https://downloads.cursor.com/aptrepo stable main
+    gpg_key: https://downloads.cursor.com/keys/anysphere.asc
+    gpg_keyring_file: /etc/apt/keyrings/cursor.gpg
+    cleanup_paths:
+      - /etc/apt/sources.list.d/cursor.sources
+      - /usr/share/keyrings/anysphere.gpg
+
+  - repo_debian_filename: warpdotdev
+    repo_desired_state: present
+    repo_debian: >-
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/warpdotdev.gpg]
+      https://releases.warp.dev/linux/deb stable main
+    gpg_key: https://releases.warp.dev/linux/keys/warp.asc
+    gpg_keyring_file: /etc/apt/keyrings/warpdotdev.gpg
+
 artifact_installs:
   - name: jetbrains-toolbox
     become: true
@@ -60,6 +87,18 @@ artifact_installs:
       links:
         - source: bin/jetbrains-toolbox
           destination: /usr/local/bin/jetbrains-toolbox
+
+  - name: opencode-desktop
+    become: true
+    source:
+      type: deb
+      metadata_url: https://api.github.com/repos/anomalyco/opencode/releases/latest
+      version_query: tag_name
+      download_url_query: >-
+        assets[?name=='{{ opencode_desktop_linux_deb_asset_name }}']
+        .browser_download_url | [0]
+    install:
+      type: package
 
   - name: kind
     become: true
@@ -224,6 +263,18 @@ artifact_installs:
       content_root: "."
       directory: "{{ node_volta_home }}/bin"
 
+remote_script_installs:
+  - name: codex
+    become: true
+    interpreter: sh
+    url: https://chatgpt.com/codex/install.sh
+    environment:
+      CODEX_NON_INTERACTIVE: "1"
+
+  - name: ollama
+    become: true
+    url: https://ollama.com/install.sh
+
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2
@@ -242,6 +293,7 @@ apt_installed_packages:
   - curl
   - libcurl4-openssl-dev
   - libssl-dev
+  - claude-code
   
   # DOCKER start
   - docker-ce
@@ -253,6 +305,7 @@ apt_installed_packages:
 
   - evolution
   - evolution-plugins
+  - cursor
   - eza
   - fonts-powerline
   - helm
@@ -280,6 +333,7 @@ apt_installed_packages:
   - virtualenvwrapper
   - vim
   - vlc
+  - warp-terminal
   - yamllint
   - zsh
   - zsh-autosuggestions
@@ -331,3 +385,21 @@ node_volta_command: "{{ node_volta_home }}/bin/volta"
 node_volta_default_node: "node@lts"
 node_volta_extra_nodes:
   - "node@latest"
+node_npm_global_packages:
+  - "@github/copilot"
+  - "@google/gemini-cli"
+  - "opencode-ai"
+
+linux_release_architecture_map:
+  x86_64: amd64
+  aarch64: arm64
+linux_release_architecture: >-
+  {{
+    linux_release_architecture_map.get(
+      ansible_facts['architecture'],
+      ansible_facts['architecture']
+    )
+  }}
+
+opencode_desktop_linux_deb_asset_name: >-
+  opencode-desktop-linux-{{ linux_release_architecture }}.deb

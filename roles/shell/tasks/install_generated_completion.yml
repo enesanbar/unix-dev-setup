@@ -1,0 +1,15 @@
+---
+- name: Generate {{ shell_generated_completion.name }} zsh completions
+  become: false
+  ansible.builtin.command:
+    argv: "{{ shell_generated_completion.command }}"
+  environment: "{{ shell_generated_completion.environment | default(omit) }}"
+  register: shell_generated_completion_result
+  changed_when: false
+
+- name: Install {{ shell_generated_completion.name }} zsh completions
+  become: false
+  ansible.builtin.copy:
+    content: "{{ shell_generated_completion_result.stdout }}"
+    dest: "{{ zsh_completions_path }}/{{ shell_generated_completion.dest }}"
+    mode: "0644"

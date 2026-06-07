@@ -1,0 +1,12 @@
+---
+- name: Install downloaded zsh completions
+  become: false
+  retries: 3
+  delay: 3
+  ansible.builtin.get_url:
+    url: "{{ shell_downloaded_completion.url }}"
+    dest: "{{ zsh_completions_path }}/{{ shell_downloaded_completion.dest }}"
+    mode: "0644"
+  loop: "{{ shell_downloaded_completions | default([]) }}"
+  loop_control:
+    loop_var: shell_downloaded_completion

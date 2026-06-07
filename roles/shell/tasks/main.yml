@@ -17,6 +17,12 @@
 - name: Install Volta zsh completions
   import_tasks: install_volta_completions.yml
 
+- name: Install generated zsh completions
+  import_tasks: install_generated_completions.yml
+
+- name: Install downloaded zsh completions
+  import_tasks: install_downloaded_completions.yml
+
 - name: Copy rc files
   ansible.builtin.copy:
     src: "{{ item.src }}"

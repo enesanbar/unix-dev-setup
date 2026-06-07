@@ -19,15 +19,15 @@
 - name: Set artifact download filename
   ansible.builtin.set_fact:
     artifact_download_filename: "{{ (artifact_download_url | regex_replace('\\?.*$', '')) | basename }}"
-    artifact_install_type: "{{ artifact.install.type | default('binary') }}"
+    artifact_install_type: "{{ artifact.install.type | default('package' if artifact.source.type == 'deb' else 'binary') }}"
     artifact_install_reset: "{{ artifact.install.reset | default(false) }}"
 
 - name: Assert artifact source details are valid
   ansible.builtin.assert:
     that:
       - artifact_download_url | length > 0
-      - artifact.source.type in ['archive', 'binary']
-      - artifact_install_type in ['binary', 'bundle']
+      - artifact.source.type in ['archive', 'binary', 'deb']
+      - artifact_install_type in ['binary', 'bundle', 'package']
     fail_msg: "Artifact {{ artifact.name }} is missing a valid download URL or source type."
 
 - name: Ensure artifact working directories exist
@@ -52,7 +52,9 @@
   ansible.builtin.stat:
     path: "{{ artifact_install_root }}/{{ artifact.name }}-{{ artifact_version }}/.extract-complete"
   register: artifact_extract_marker
-  when: artifact.source.type == 'archive'
+  when:
+    - artifact.source.type == 'archive'
+    - artifact_install_type != 'package'
 
 - name: Extract artifact payload
   ansible.builtin.unarchive:
@@ -61,6 +63,7 @@
     remote_src: yes
   when:
     - artifact.source.type == 'archive'
+    - artifact_install_type != 'package'
     - not artifact_extract_marker.stat.exists
 
 - name: Mark artifact payload as extracted
@@ -70,6 +73,7 @@
     mode: "0644"
   when:
     - artifact.source.type == 'archive'
+    - artifact_install_type != 'package'
     - not artifact_extract_marker.stat.exists
 
 - name: Find installed artifact binary in extracted payload
@@ -81,6 +85,7 @@
   register: artifact_binary_candidates
   when:
     - artifact.source.type == 'archive'
+    - artifact_install_type == 'binary'
     - artifact.binary is defined
 
 - name: Assert extracted artifact binary was found
@@ -90,6 +95,7 @@
     fail_msg: "Expected exactly one {{ artifact.binary.name }} binary for {{ artifact.name }}, found {{ artifact_binary_candidates.matched }}."
   when:
     - artifact.source.type == 'archive'
+    - artifact_install_type == 'binary'
     - artifact.binary is defined
 
 - name: Set artifact binary source path
@@ -97,6 +103,7 @@
     artifact_binary_source: "{{ artifact_binary_candidates.files[0].path }}"
   when:
     - artifact.source.type == 'archive'
+    - artifact_install_type == 'binary'
     - artifact.binary is defined
 
 - name: Set direct artifact binary source path
@@ -201,6 +208,13 @@
   loop_control:
     loop_var: artifact_link
   when: artifact_install_type == 'bundle'
+
+- name: Install artifact package
+  become: "{{ artifact.become | default(true) }}"
+  ansible.builtin.apt:
+    deb: "{{ artifact_download.dest }}"
+    state: present
+  when: artifact_install_type == 'package'
 
 - name: Link artifact bundle launchers
   become: "{{ artifact.become | default(true) }}"
