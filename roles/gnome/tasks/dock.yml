@@ -48,5 +48,6 @@
           'postman_postman.desktop',
           'code_code.desktop',
           'ghostty_ghostty.desktop',
-          'notion-snap_notion-snap.desktop'
+          'notion-snap_notion-snap.desktop',
+          'freelens_freelens.desktop'
         ]

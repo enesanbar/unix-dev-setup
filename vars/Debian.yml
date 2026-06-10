@@ -327,6 +327,8 @@ apt_installed_packages:
 
 
 snap_installed_packages:
+  - name: aws-cli
+    classic: true
   - name: code
     classic: true
   - name: ghostty
@@ -350,6 +352,8 @@ snap_installed_packages:
     classic: false
   - name: trello-desktop
     classic: false
+  - name: freelens
+    classic: true
 python_uv_python_versions:
   - 3.14.5
   - 3.13.13

@@ -102,7 +102,7 @@ homebrew_cask_apps:
   - google-drive
   - iterm2
   - jetbrains-toolbox
-  - lens
+  - freelens
   - lyricsx
   - mysqlworkbench
   - notion
