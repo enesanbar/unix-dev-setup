@@ -1,0 +1,25 @@
+---
+- name: SSH Client | Ensure ~/.ssh exists
+  ansible.builtin.file:
+    path: "~/.ssh"
+    state: directory
+    mode: "0700"
+
+- name: SSH Client | Add LAN hosts to ~/.ssh/config
+  ansible.builtin.blockinfile:
+    path: "~/.ssh/config"
+    create: true
+    mode: "0600"
+    insertbefore: BOF
+    marker: "# {mark} ANSIBLE MANAGED: LAN hosts"
+    block: |
+      {% for host in ssh_client_hosts %}
+      Host {{ host.alias }}
+        HostName {{ host.hostname }}
+        User {{ host.user }}
+        ServerAliveInterval 60
+        # Reuse one connection for repeated ssh/rsync calls
+        ControlMaster auto
+        ControlPath ~/.ssh/cm-%C
+        ControlPersist 10m
+      {% endfor %}

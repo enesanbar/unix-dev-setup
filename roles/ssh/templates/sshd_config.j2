@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+Port {{ ssh_server_port }}
+
+# Key-based authentication only
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+PermitRootLogin no
+
+# Only allow listed users, from loopback and the LAN
+AllowUsers{% for user in ssh_server_allowed_users %}{% for net in ['127.0.0.1', '::1'] + ssh_server_allowed_networks %} {{ user }}@{{ net }}{% endfor %}{% endfor %}
+
+
+MaxAuthTries 3
+LoginGraceTime 30
+X11Forwarding no

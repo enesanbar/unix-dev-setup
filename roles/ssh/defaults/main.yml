@@ -1,0 +1,19 @@
+---
+# --- Server (Debian) ---
+# Only these networks may log in over SSH (enforced by sshd AllowUsers and ufw).
+# Loopback is always allowed.
+ssh_server_allowed_networks:
+  - 192.168.0.0/24
+
+ssh_server_port: 22
+
+# Users allowed to log in. Defaults to the user running the playbook.
+ssh_server_allowed_users:
+  - "{{ ansible_facts['user_id'] }}"
+
+# --- Client (Darwin) ---
+# Hosts written to ~/.ssh/config so e.g. `ssh ubuntu` / `rsync -a dir/ ubuntu:/tmp/x/` work.
+ssh_client_hosts:
+  - alias: ubuntu
+    hostname: 192.168.0.155
+    user: enesanbar
