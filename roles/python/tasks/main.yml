@@ -1,42 +1,61 @@
 ---
-- ansible.builtin.include_role:
-    name: staticdev.pyenv
-  vars:
-    pyenv_env: "user"
-    # from https://github.com/pyenv/pyenv/releases
-    pyenv_version: "v2.3.35"
-    # from https://github.com/pyenv/pyenv-virtualenv/releases
-    pyenv_virtualenv_version: "v1.2.1"
-    # from https://github.com/pyenv/pyenv-update/commits/master/
-    pyenv_update_version: "172a0ed"
-    pyenv_shellrc_file: "{{ ansible_env.HOME }}/.shrc"
-    pyenv_path: "{{ ansible_env.HOME }}/.pyenv"
-    pyenvrc_path: "{{ ansible_env.HOME }}"
-    pyenv_global:
-      - 3.12.1
-      - 3.11.0
-      - 3.10.8
-    pyenv_enable_autocompletion: true
-    pyenv_python_versions:
-      - 3.12.1
-      - 3.11.0
-      - 3.10.8
-    pyenv_enable_virtualenvs: true
-    pyenv_virtualenvs:
-      - venv_name: python-v312
-        py_version: 3.12.1
-      - venv_name: python-v311
-        py_version: 3.11.0
-      - venv_name: python-v310
-        py_version: 3.10.8
-    pyenv_make_opts: "-j4"
-    pyenv_python_configure_opts: "--enable-optimizations --with-lto --with-ensurepip=upgrade"
-    pyenv_python_cflags: "-march=native -mtune=native"
-    pyenv_profile_task: "-m test.regrtest --pgo -j0"
+# pyenv kept commented out for reference while uv is the active workflow.
+# - ansible.builtin.include_role:
+#     name: staticdev.pyenv
+#   vars:
+#     pyenv_env: "user"
+#     pyenv_version: "v2.3.35"
+#     pyenv_virtualenv_version: "v1.2.1"
+#     pyenv_update_version: "172a0ed"
+#     pyenv_shellrc_file: "{{ ansible_env.HOME }}/.shrc"
+#     pyenv_path: "{{ ansible_env.HOME }}/.pyenv"
+#     pyenvrc_path: "{{ ansible_env.HOME }}"
+#     pyenv_global:
+#       - 3.12.1
+#       - 3.11.0
+#       - 3.10.8
+#     pyenv_enable_autocompletion: true
+#     pyenv_python_versions:
+#       - 3.12.1
+#       - 3.11.0
+#       - 3.10.8
+#     pyenv_enable_virtualenvs: true
+#     pyenv_virtualenvs:
+#       - venv_name: python-v312
+#         py_version: 3.12.1
+#       - venv_name: python-v311
+#         py_version: 3.11.0
+#       - venv_name: python-v310
+#         py_version: 3.10.8
+#     pyenv_make_opts: "-j4"
+#     pyenv_python_configure_opts: "--enable-optimizations --with-lto --with-ensurepip=upgrade"
+#     pyenv_python_cflags: "-march=native -mtune=native"
+#     pyenv_profile_task: "-m test.regrtest --pgo -j0"
 
-# tasks file for python
-- name: Install global pip packages
-  ansible.builtin.pip:
-    virtualenv: "{{ python_virtual_env_python }}"
-    name: "{{ python_virtual_env_pip_packages }}"
-    state: present
+- name: Install uv-managed Python versions
+  ansible.builtin.command:
+    argv:
+      - uv
+      - python
+      - install
+      - "{{ item }}"
+  loop: "{{ python_uv_python_versions }}"
+  register: uv_python_install_result
+  changed_when: "'already installed' not in ((uv_python_install_result.stdout | default('')) ~ (uv_python_install_result.stderr | default('')) | lower)"
+
+- name: Ensure uv Python tools virtualenv exists
+  ansible.builtin.command:
+    argv:
+      - uv
+      - venv
+      - "{{ python_uv_tool_venv_path }}"
+      - --python
+      - "{{ python_uv_default_python }}"
+  args:
+    creates: "{{ python_uv_tool_venv_path }}/bin/python"
+
+- name: Install Python tool packages with uv
+  ansible.builtin.command:
+    argv: "{{ ['uv', 'pip', 'install', '--python', python_uv_tool_venv_path ~ '/bin/python'] + python_uv_tool_packages }}"
+  register: uv_python_tools_result
+  changed_when: "'installed' in (((uv_python_tools_result.stdout | default('')) ~ (uv_python_tools_result.stderr | default(''))) | lower) or 'uninstalled' in (((uv_python_tools_result.stdout | default('')) ~ (uv_python_tools_result.stderr | default(''))) | lower)"

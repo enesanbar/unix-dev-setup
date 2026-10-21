@@ -5,7 +5,7 @@
   delay: 3
   ansible.builtin.get_url:
     url: "{{ item.src }}"
-    dest: "{{ ansible_facts['env']['ZSH'] }}/completions/{{ item.dest }}"
+    dest: "{{ zsh_completions_path }}/{{ item.dest }}"
   with_items:
     - src: "https://raw.githubusercontent.com/ahmetb/kubectx/master/completion/_kubectx.zsh"
       dest: "_kubectx.zsh"

@@ -1,0 +1,6 @@
+---
+- name: Install artifact-based tools
+  ansible.builtin.include_tasks: install.yml
+  loop: "{{ artifact_installs | default([]) }}"
+  loop_control:
+    loop_var: artifact

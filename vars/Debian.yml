@@ -2,26 +2,35 @@
 
 # http://docs.ansible.com/ansible/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 aptcachetime: 3600
+apt_ubuntu_release: "{{ ansible_facts['distribution_release'] }}"
+docker_conflicting_packages:
+  - docker.io
+  - docker-compose
+  - docker-compose-v2
+  - docker-doc
+  - podman-docker
+  - containerd
+  - runc
 
 apt_repos:
   - repo_debian_filename: docker
     repo_desired_state: present
-    repo_debian: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable
+    repo_debian: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ apt_ubuntu_release }} stable
     gpg_key: https://download.docker.com/linux/ubuntu/gpg
     gpg_keyring_file: /etc/apt/keyrings/docker.gpg
 
   - repo_debian_filename: hashicorp
     repo_desired_state: present
-    repo_debian: deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com jammy main
+    repo_debian: deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ apt_ubuntu_release }} main
     gpg_key: https://apt.releases.hashicorp.com/gpg
     gpg_keyring_file: /usr/share/keyrings/hashicorp-archive-keyring.gpg
 
   - repo_debian_filename: helm
     repo_desired_state: present
-    repo_debian: deb [arch=amd64 signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main
-    gpg_key: https://baltocdn.com/helm/signing.asc
+    repo_debian: deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main
+    gpg_key: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
     gpg_keyring_file: /usr/share/keyrings/helm.gpg
-    
+
   - repo_debian_filename: google
     repo_desired_state: present
     repo_debian: deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main
@@ -33,25 +42,230 @@ apt_repos:
     repo_debian: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /
     gpg_key: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
     gpg_keyring_file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-  
-  - repo_debian_filename: sublime-text
-    repo_desired_state: present
-    repo_debian: deb [signed-by=/usr/share/keyrings/sublimehq.gpg] https://download.sublimetext.com/ apt/stable/
-    gpg_key: https://download.sublimetext.com/sublimehq-pub.gpg
-    gpg_keyring_file: /usr/share/keyrings/sublimehq.gpg
 
-  - repo_debian_filename: telepresence
+  - repo_debian_filename: cursor
     repo_desired_state: present
-    repo_debian: deb [signed-by=/usr/share/keyrings/datawireio_telepresence-archive-keyring.gpg] https://packagecloud.io/datawireio/telepresence/ubuntu/ xenial main
-    gpg_key: https://packagecloud.io/datawireio/telepresence/gpgkey
-    gpg_keyring_file: /usr/share/keyrings/datawireio_telepresence-archive-keyring.gpg
+    repo_debian: >-
+      deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg]
+      https://downloads.cursor.com/aptrepo stable main
+    gpg_key: https://downloads.cursor.com/keys/anysphere.asc
+    gpg_keyring_file: /etc/apt/keyrings/cursor.gpg
+    cleanup_paths:
+      - /etc/apt/sources.list.d/cursor.sources
+      - /usr/share/keyrings/anysphere.gpg
+
+  - repo_debian_filename: warpdotdev
+    repo_desired_state: present
+    repo_debian: >-
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/warpdotdev.gpg]
+      https://releases.warp.dev/linux/deb stable main
+    gpg_key: https://releases.warp.dev/linux/keys/warp.asc
+    gpg_keyring_file: /etc/apt/keyrings/warpdotdev.gpg
+
+artifact_installs:
+  - name: jetbrains-toolbox
+    become: true
+    source:
+      type: archive
+      metadata_url: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
+      version_query: "TBA[0].build"
+      download_url_query: "TBA[0].downloads.linux.link"
+    binary:
+      name: jetbrains-toolbox
+    install:
+      type: bundle
+      reset: true
+      directory: /opt/jetbrains-toolbox
+      links:
+        - source: bin/jetbrains-toolbox
+          destination: /usr/local/bin/jetbrains-toolbox
+
+  - name: opencode-desktop
+    become: true
+    source:
+      type: deb
+      metadata_url: https://api.github.com/repos/anomalyco/opencode/releases/latest
+      version_query: tag_name
+      download_url_query: >-
+        assets[?name=='{{ opencode_desktop_linux_deb_asset_name }}']
+        .browser_download_url | [0]
+    install:
+      type: package
+
+  - name: kind
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/kubernetes-sigs/kind/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'kind-linux-amd64')].browser_download_url | [0]"
+    destination: /usr/local/bin/kind
+    mode: "0755"
+
+  - name: kubebuilder
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/kubernetes-sigs/kubebuilder/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='kubebuilder_linux_amd64'].browser_download_url | [0]"
+    destination: /usr/local/bin/kubebuilder
+    mode: "0755"
+
+  - name: stern
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/stern/stern/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'stern_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: stern
+    destination: /usr/local/bin/stern
+    mode: "0755"
+
+  - name: mkcert
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/FiloSottile/mkcert/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'mkcert') && contains(name, 'linux-amd64')].browser_download_url | [0]"
+    destination: /usr/local/bin/mkcert
+    mode: "0755"
+
+  - name: kubeseal
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/bitnami-labs/sealed-secrets/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'kubeseal-') && ends_with(name, 'linux-amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: kubeseal
+    destination: /usr/local/bin/kubeseal
+    mode: "0755"
+
+  - name: terragrunt
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='terragrunt_linux_amd64'].browser_download_url | [0]"
+    destination: /usr/local/bin/terragrunt
+    mode: "0755"
+
+  - name: argocd
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/argoproj/argo-cd/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='argocd-linux-amd64'].browser_download_url | [0]"
+    destination: /usr/local/bin/argocd
+    mode: "0755"
+
+  - name: sops
+    become: true
+    source:
+      type: binary
+      metadata_url: https://api.github.com/repos/mozilla/sops/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'sops-v') && ends_with(name, '.linux.amd64')].browser_download_url | [0]"
+    destination: /usr/local/bin/sops
+    mode: "0755"
+
+  - name: vegeta
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/tsenart/vegeta/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'vegeta_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: vegeta
+    destination: /usr/local/bin/vegeta
+    mode: "0755"
+
+  - name: helm-docs
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/norwoodj/helm-docs/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'helm-docs_') && ends_with(name, 'Linux_x86_64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: helm-docs
+    destination: /usr/local/bin/helm-docs
+    mode: "0755"
+
+  - name: chart-testing
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/helm/chart-testing/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'chart-testing_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: ct
+    destination: /usr/local/bin/ct
+    mode: "0755"
+
+  - name: dive
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/wagoodman/dive/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?contains(name, 'dive_') && ends_with(name, 'linux_amd64.tar.gz')].browser_download_url | [0]"
+    binary:
+      name: dive
+    destination: /usr/local/bin/dive
+    mode: "0755"
+
+  - name: uv
+    become: true
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/astral-sh/uv/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?name=='uv-x86_64-unknown-linux-gnu.tar.gz'].browser_download_url | [0]"
+    binary:
+      name: uv
+    install:
+      type: bundle
+      reset: true
+      directory: /opt/uv
+      links:
+        - source: uv
+          destination: /usr/local/bin/uv
+        - source: uvx
+          destination: /usr/local/bin/uvx
+
+  - name: volta
+    become: false
+    source:
+      type: archive
+      metadata_url: https://api.github.com/repos/volta-cli/volta/releases/latest
+      version_query: tag_name
+      download_url_query: "assets[?ends_with(name, 'linux.tar.gz')].browser_download_url | [0]"
+    install:
+      type: bundle
+      content_root: "."
+      directory: "{{ node_volta_home }}/bin"
+
+remote_script_installs:
+  - name: ollama
+    become: true
+    url: https://ollama.com/install.sh
 
 apt_installed_packages:
   # FUSE requirements for jetbrains-toolbox
   - libfuse2
   - libxi6
   - libxrender1
-  - libxtst6 
+  - libxtst6
   - mesa-utils
   - libfontconfig
   - libgtk-3-bin
@@ -69,13 +283,14 @@ apt_installed_packages:
   - docker-ce
   - docker-ce-cli
   - containerd.io
-  - docker-compose
+  - docker-buildx-plugin
   - docker-compose-plugin
   # DOCKER end
 
   - evolution
   - evolution-plugins
-  - exa
+  - cursor
+  - eza
   - fonts-powerline
   - helm
   - htop
@@ -90,13 +305,10 @@ apt_installed_packages:
   - make
   - network-manager-openvpn-gnome
   - packer
-  - pinta
   - python-is-python3
   - python3-virtualenv
   - python3-dev
   - python3-pip
-  - sublime-text
-  - telepresence
   - terminator
   - terraform
   - unzip
@@ -105,6 +317,7 @@ apt_installed_packages:
   - virtualenvwrapper
   - vim
   - vlc
+  - warp-terminal
   - yamllint
   - zsh
   - zsh-autosuggestions
@@ -114,7 +327,11 @@ apt_installed_packages:
 
 
 snap_installed_packages:
+  - name: aws-cli
+    classic: true
   - name: code
+    classic: true
+  - name: ghostty
     classic: true
   - name: dbeaver-ce
     classic: true
@@ -135,105 +352,42 @@ snap_installed_packages:
     classic: false
   - name: trello-desktop
     classic: false
-
-
-github_releases:
-  - repo: kubernetes-sigs/kind
-    name: kind
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kind
-    type: binary
-
-  - repo: kubernetes-sigs/kubebuilder
-    name: kubebuilder
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kubebuilder
-    type: binary
-    remote_binary_name: kubebuilder_linux_amd64
-
-  - repo: stern/stern
-    name: stern
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/stern
-    type: tar.gz
-    binary_location: stern
-
-  - repo: FiloSottile/mkcert
-    name: mkcert
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/mkcert
-    type: binary
-
-  - repo: bitnami-labs/sealed-secrets
-    name: kubeseal
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/kubeseal
-    type: tar.gz
-    binary_location: kubeseal
-
-  - repo: gruntwork-io/terragrunt
-    name: terragrunt
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/terragrunt
-    type: binary
-
-  - repo: argoproj/argo-cd
-    name: argocd
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/argocd
-    type: binary
-
-  - repo: mozilla/sops
-    name: sops
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/sops
-    type: binary
-
-  - repo: tsenart/vegeta
-    name: vegeta
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/vegeta
-    type: tar.gz
-    binary_location: vegeta
-
-  - repo: norwoodj/helm-docs
-    name: helm-docs
-    os: Linux
-    arch: x86_64
-    destination: /usr/local/bin/helm-docs
-    type: tar.gz
-    binary_location: helm-docs
-
-  - repo: helm/chart-testing
-    name: chart-testing
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/ct
-    type: tar.gz
-    binary_location: ct
-
-  - repo: wagoodman/dive
-    name: dive
-    os: linux
-    arch: amd64
-    destination: /usr/local/bin/dive
-    type: tar.gz
-    binary_location: dive
-
-python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.pyenv/versions"
-python_virtual_env_python: "{{ python_virtual_envs_folder }}/latest_v312"
-python_virtual_env_pip_packages:
+  - name: freelens
+    classic: true
+python_uv_python_versions:
+  - 3.14.5
+  - 3.13.13
+  - 3.12.1
+  - 3.10.8
+python_uv_default_python: "3.14.5"
+python_uv_tool_venv_path: "{{ ansible_facts['env']['HOME'] }}/.venvs/python"
+python_uv_tool_packages:
   - docker
   - gitman
   - psutil
   - pytest
   - refurb
+
+node_volta_home: "{{ ansible_facts['env']['HOME'] }}/.volta"
+node_volta_command: "{{ node_volta_home }}/bin/volta"
+node_volta_default_node: "node@lts"
+node_volta_extra_nodes:
+  - "node@latest"
+node_npm_global_packages:
+  - "@github/copilot"
+  - "@google/gemini-cli"
+  - "opencode-ai"
+
+linux_release_architecture_map:
+  x86_64: amd64
+  aarch64: arm64
+linux_release_architecture: >-
+  {{
+    linux_release_architecture_map.get(
+      ansible_facts['architecture'],
+      ansible_facts['architecture']
+    )
+  }}
+
+opencode_desktop_linux_deb_asset_name: >-
+  opencode-desktop-linux-{{ linux_release_architecture }}.deb

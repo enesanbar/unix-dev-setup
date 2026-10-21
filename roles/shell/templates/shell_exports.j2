@@ -32,9 +32,9 @@ BULLETTRAIN_PROMPT_ORDER=(
     cmd_exec_time
 )
 
-{% if ansible_os_family == 'Debian' %}
+{% if ansible_facts['os_family'] == 'Debian' %}
 export BULLETTRAIN_KCTX_KCONFIG=/home/enesanbar/.kube/config
-{% elif ansible_os_family == 'Darwin' %}
+{% elif ansible_facts['os_family'] == 'Darwin' %}
 export BULLETTRAIN_KCTX_KCONFIG=/Users/enesanbar/.kube/config
 {% endif %}
 
@@ -49,7 +49,8 @@ BULLETTRAIN_EXEC_TIME_ELAPSED=1
 
 # Go lang
 export GOPATH="${HOME}/go"
-export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
+export VOLTA_HOME="{{ node_volta_home }}"
+export PATH="${VOLTA_HOME}/bin:{{ python_uv_tool_venv_path }}/bin:${HOME}/.local/bin:${PATH}:${GOPATH}/bin:${GOROOT}/bin"
 
 # Kubectl autocompletion
 if [ $commands[kubectl] ]; then source <(kubectl completion zsh); fi
@@ -58,31 +59,26 @@ if [ $commands[flux] ]; then source <(flux completion zsh); fi
 if [ $commands[kubebuilder] ]; then source <(kubebuilder completion zsh); fi
 if [ $commands[stern] ]; then source <(stern --completion=zsh); fi
 
-## Virtualenv wrapper
-export WORKON_HOME="{{ python_virtual_envs_folder }}"
-#export PROJECT_HOME=$HOME/workspace
-#export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv
-#export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+# pyenv / virtualenvwrapper (disabled for now, kept for reference)
+# export WORKON_HOME="$HOME/.pyenv/versions"
+# source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+# workon latest_v312
+# if [ $commands[register-python-argcomplete] ]; then source <(register-python-argcomplete pytest); fi
+#
+# uv equivalents:
+# uv python install {{ python_uv_default_python }}
+# uv venv {{ python_uv_tool_venv_path }} --python {{ python_uv_default_python }}
 
-{% if ansible_os_family == 'Debian' %}
-source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-{% elif ansible_os_family == 'Darwin' %}
-source /opt/homebrew/bin/virtualenvwrapper.sh
-{% endif %}
-
-# setup virtualenv to work on the python at ~/.env/python
-# TODO: create virtualenv named python if not exists
-workon latest_v312
-
-# Python autocomplete
-if [ $commands[register-python-argcomplete] ]; then source <(register-python-argcomplete pytest); fi
+# Node / Volta
+# volta install node@lts
+# volta fetch node@latest
 
 # Python environment
 export PYTHONSTARTUP={{ python_startup_file_location }}
 
-{% if ansible_os_family == 'Debian' %}
+{% if ansible_facts['os_family'] == 'Debian' %}
 complete -o nospace -C /usr/bin/terraform terraform
-{% elif ansible_os_family == 'Darwin' %}
+{% elif ansible_facts['os_family'] == 'Darwin' %}
 FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 {% endif %}

@@ -25,6 +25,7 @@ homebrew_installed_packages:
   - git-flow
   - gnu-sed
   - gh
+  - gemini-cli
   - go
   - go-swagger
   - golangci-lint
@@ -51,10 +52,11 @@ homebrew_installed_packages:
   - mkcert
   - mockery
   - ngrok
-  - node
-  - nvm
+  - anomalyco/tap/opencode
   - openstackclient
   - pyenv
+  - uv
+  - volta
   - python-yq
   - rs/tap/curlie
   - skaffold
@@ -70,7 +72,6 @@ homebrew_installed_packages:
   - virtualenv
   - virtualenvwrapper
   - yamllint
-  - yarn
   - watch
   - weaveworks/tap/eksctl
   - wget
@@ -85,9 +86,12 @@ homebrew_taps:
   - weaveworks/tap
   - git-chglog/git-chglog
   - go-swagger/go-swagger
+  - anomalyco/tap
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
+  - claude
+  - cursor
   - docker
   - drawio
   - fig # IDE-style autocomplete to terminal.
@@ -98,10 +102,12 @@ homebrew_cask_apps:
   - google-drive
   - iterm2
   - jetbrains-toolbox
-  - lens
+  - freelens
   - lyricsx
   - mysqlworkbench
   - notion
+  - ollama-app
+  - opencode-desktop
   - pgadmin4
   - postman
   - robo-3t
@@ -118,14 +124,28 @@ homebrew_cask_apps:
 #  - virtualbox
   - visual-studio-code
   - vlc
+  - warp
   - whatsapp
   - zoom
 
-python_virtual_envs_folder: "{{ ansible_facts['env']['HOME'] }}/.venv"
-python_virtual_env_python: "{{ python_virtual_envs_folder }}/python"
-python_virtual_env_pip_packages:
+python_uv_python_versions:
+  - 3.14.5
+  - 3.13.13
+  - 3.12.1
+  - 3.10.8
+python_uv_default_python: "3.14.5"
+python_uv_tool_venv_path: "{{ ansible_facts['env']['HOME'] }}/.venvs/python"
+python_uv_tool_packages:
   - docker
   - gitman
   - psutil
   - pytest
   - refurb
+
+node_volta_home: "{{ ansible_facts['env']['HOME'] }}/.volta"
+node_volta_command: "volta"
+node_volta_default_node: "node@lts"
+node_volta_extra_nodes:
+  - "node@latest"
+node_npm_global_packages:
+  - "@github/copilot"

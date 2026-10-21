@@ -7,5 +7,7 @@ this playbook sets up most of the software, and their configuration on my unix m
 ansible-playbook main.yml --ask-become-pass
 ```
 
+On the first run, the playbook installs the Galaxy roles and collections from `requirements.yml` into `.ansible/` inside the repository before executing the OS-specific roles.
+
 ## WIP
 This playbook is currently work-in-progress.

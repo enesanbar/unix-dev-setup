@@ -5,11 +5,23 @@
 
 - name: Import install_debian.yml if OS family is Debian
   import_tasks: install_debian.yml
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 - name: Import install_debian.yml if OS family is Debian
   import_tasks: install_kubectx_completions.yml
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Install uv zsh completions
+  import_tasks: install_uv_completions.yml
+
+- name: Install Volta zsh completions
+  import_tasks: install_volta_completions.yml
+
+- name: Install generated zsh completions
+  import_tasks: install_generated_completions.yml
+
+- name: Install downloaded zsh completions
+  import_tasks: install_downloaded_completions.yml
 
 # compinit rejects world- or group-writable directories on its fpath, and on
 # macOS every plugin and completion lands in the shared 'staff' group. This

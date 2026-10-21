@@ -1,0 +1,29 @@
+---
+- name: Prepare temporary installer path for {{ remote_script_install.name }}
+  ansible.builtin.tempfile:
+    state: file
+    suffix: ".sh"
+  register: remote_script_install_tempfile
+
+- name: Download installer for {{ remote_script_install.name }}
+  ansible.builtin.get_url:
+    url: "{{ remote_script_install.url }}"
+    dest: "{{ remote_script_install_tempfile.path }}"
+    mode: "0755"
+    force: true
+
+- name: Run installer for {{ remote_script_install.name }}
+  become: "{{ remote_script_install.become | default(false) }}"
+  ansible.builtin.command:
+    argv: >-
+      {{
+        [remote_script_install.interpreter | default('bash'),
+        remote_script_install_tempfile.path]
+        + (remote_script_install.args | default([]))
+      }}
+  environment: "{{ remote_script_install.environment | default(omit) }}"
+
+- name: Remove installer for {{ remote_script_install.name }}
+  ansible.builtin.file:
+    path: "{{ remote_script_install_tempfile.path }}"
+    state: absent

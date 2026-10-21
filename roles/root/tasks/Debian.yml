@@ -1,34 +1,69 @@
 ---
+- name: Debian/Ubuntu Family | Ensure apt keyring directories exist
+  become: true
+  ansible.builtin.file:
+    path: "{{ item.gpg_keyring_file | dirname }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ apt_repos }}"
+
 - name: Debian/Ubuntu Family | Add gpg signing keys
-  become: yes
-  apt_key:
+  become: true
+  ansible.builtin.get_url:
     url: "{{ item.gpg_key }}"
-    state: present
-    keyring: "{{ item.gpg_keyring_file }}"
-  with_items: "{{ apt_repos }}"
+    dest: "{{ item.gpg_keyring_file }}.asc"
+    mode: "0644"
+    force: true
+  loop: "{{ apt_repos }}"
+  register: apt_repo_key_downloads
+
+- name: Debian/Ubuntu Family | Dearmor gpg signing keys
+  become: true
+  ansible.builtin.command:
+    argv:
+      - gpg
+      - --batch
+      - --yes
+      - --dearmor
+      - --output
+      - "{{ downloaded_key.item.gpg_keyring_file }}"
+      - "{{ downloaded_key.item.gpg_keyring_file }}.asc"
+  loop: "{{ apt_repo_key_downloads.results }}"
+  loop_control:
+    loop_var: downloaded_key
+  changed_when: downloaded_key.changed
+
+- name: Debian/Ubuntu Family | Remove legacy apt repository definitions
+  become: true
+  ansible.builtin.file:
+    path: "{{ item.1 }}"
+    state: absent
+  loop: "{{ query('subelements', apt_repos, 'cleanup_paths', {'skip_missing': true}) }}"
 
 - name: Debian/Ubuntu Family | Adding apt repositories
-  become: yes
-  apt_repository:
+  become: true
+  ansible.builtin.apt_repository:
     repo: "{{ item.repo_debian }}"
     state: "{{ item.repo_desired_state }}"
     filename: "{{ item.repo_debian_filename }}"
-    update_cache: yes
+    update_cache: true
   loop: "{{ apt_repos }}"
+
+- name: Debian/Ubuntu Family | Remove conflicting Docker packages
+  become: true
+  ansible.builtin.apt:
+    name: "{{ docker_conflicting_packages }}"
+    state: absent
 
 - name: Install apt packages
   become: true
-  apt: 
+  ansible.builtin.apt:
     pkg: "{{ apt_installed_packages }}"
     state: latest
-    update_cache: yes
+    update_cache: true
     cache_valid_time: "{{ aptcachetime }}"
   notify:
     - Restart network manager
-
-# - include_role:
-#     name: github-releases
-#   with_items: "{{ github_releases }}"
 
 - name: Install snap packages
   become: true
@@ -38,19 +73,29 @@
     channel: "{{ item.channel | default('stable') }}"
   with_items: "{{ snap_installed_packages }}"
 
+- name: Install artifact-based tools
+  ansible.builtin.include_role:
+    name: artifacts
+
+- name: Install script-managed tools
+  ansible.builtin.include_tasks: install_remote_script.yml
+  loop: "{{ remote_script_installs | default([]) }}"
+  loop_control:
+    loop_var: remote_script_install
+
 - name: Ensure group "docker" exists
   ansible.builtin.group:
     name: docker
     state: present
 
 - name: Add current user to docker group
-  become: yes
+  become: true
   ansible.builtin.user:
     name: "{{ ansible_facts['env']['USERNAME'] }}"
     groups: docker
-    append: yes
+    append: true
 
-- include_role:
+- ansible.builtin.include_role:
     name: "{{ item }}"
   loop:
     - linux
