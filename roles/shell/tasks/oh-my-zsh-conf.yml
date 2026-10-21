@@ -10,13 +10,6 @@
     repo: https://github.com/ohmyzsh/ohmyzsh.git
     dest: "{{ oh_my_zsh_path }}"
 
-- name: set permissions of oh-my-zsh
-  become: yes
-  file:
-    path: "{{ oh_my_zsh_path }}"
-    mode: 'go-w'
-    recurse: yes
-
 - name: Download bullet-train theme for oh-my-zsh
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/caiogondim/bullet-train.zsh/master/bullet-train.zsh-theme
@@ -53,21 +46,46 @@
 
 
 ##### ZSH Plugins
+# Earlier runs cloned these straight into the oh-my-zsh repo. Where
+# oh-my-zsh bundles a plugin of the same name its checkout overwrites the
+# clone's files, and the clone then refuses to update because its worktree
+# looks locally modified. Nothing oh-my-zsh ships carries a nested .git, so
+# any that turns up under plugins/ is a leftover clone to clear out.
+- name: Look for plugin clones left inside the oh-my-zsh repo
+  ansible.builtin.find:
+    paths: "{{ oh_my_zsh_path | expanduser }}/plugins"
+    patterns: ".git"
+    file_type: any
+    hidden: true
+    recurse: true
+    depth: 2
+  register: oh_my_zsh_stale_plugins
+
+- name: Remove plugin clones left inside the oh-my-zsh repo
+  ansible.builtin.file:
+    path: "{{ stale.path | dirname }}"
+    state: absent
+  register: oh_my_zsh_stale_plugins_removed
+  with_items: "{{ oh_my_zsh_stale_plugins.files }}"
+  loop_control:
+    loop_var: stale
+    label: "{{ stale.path | dirname | basename }}"
+
+- name: Restore the bundled plugins those clones displaced
+  ansible.builtin.command:
+    cmd: git checkout -- plugins
+    chdir: "{{ oh_my_zsh_path | expanduser }}"
+  when: oh_my_zsh_stale_plugins_removed is changed
+  changed_when: true
+
 - name: Install oh my zsh plugins
   ansible.builtin.git:
     repo: "{{ plugin.repo }}"
-    dest: "{{ plugin.dest }}"
-  with_items:
-    - repo: https://github.com/zsh-users/zsh-autosuggestions.git
-      dest: "{{ oh_my_zsh_path }}/plugins/zsh-autosuggestions"
-    - repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
-      dest: "{{ oh_my_zsh_path }}/plugins/zsh-syntax-highlighting"
-    - repo: https://github.com/zdharma-continuum/fast-syntax-highlighting.git
-      dest: "{{ oh_my_zsh_path }}/plugins/fast-syntax-highlighting"
-    - repo: https://github.com/marlonrichert/zsh-autocomplete.git
-      dest: "{{ oh_my_zsh_path }}/plugins/zsh-autocomplete"
+    dest: "{{ oh_my_zsh_custom_path }}/plugins/{{ plugin.name }}"
+  with_items: "{{ oh_my_zsh_plugins }}"
   loop_control:
     loop_var: plugin
+    label: "{{ plugin.name }}"
 
 ##### COMPLETIONS
 - name: Ensure completions dir exists

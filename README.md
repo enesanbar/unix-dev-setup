@@ -11,3 +11,14 @@ On the first run, the playbook installs the Galaxy roles and collections from `r
 
 ## WIP
 This playbook is currently work-in-progress.
+
+## SSH between LAN machines
+The `ssh` role sets up a key-only SSH server on Ubuntu (restricted to `ssh_server_allowed_networks`)
+and adds the `ubuntu` host alias to `~/.ssh/config` on macOS. Public keys are not managed here;
+append the client's public key to `~/.ssh/authorized_keys` on the server manually.
+
+```sh
+# on the Mac
+ssh ubuntu 'uname -a'
+rsync -avz ./some-dir/ ubuntu:/tmp/some-dir/
+```

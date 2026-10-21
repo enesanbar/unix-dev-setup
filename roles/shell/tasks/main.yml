@@ -23,6 +23,18 @@
 - name: Install downloaded zsh completions
   import_tasks: install_downloaded_completions.yml
 
+# compinit rejects world- or group-writable directories on its fpath, and on
+# macOS every plugin and completion lands in the shared 'staff' group. This
+# runs last so it covers the plugin clones and completions installed above.
+# No become: everything under here is owned by the invoking user, and running
+# it as root would resolve the path against root's home instead.
+- name: Set permissions of oh-my-zsh
+  ansible.builtin.file:
+    path: "{{ oh_my_zsh_path | expanduser }}"
+    state: directory
+    mode: 'go-w'
+    recurse: yes
+
 - name: Copy rc files
   ansible.builtin.copy:
     src: "{{ item.src }}"
