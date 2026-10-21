@@ -13,6 +13,17 @@ shell_files_to_source:
 oh_my_zsh_path: "~/.oh-my-zsh"
 oh_my_zsh_bullet_train_path: >-
   {{ oh_my_zsh_path }}/themes/bullet-train.zsh-theme
+oh_my_zsh_custom_path: "{{ oh_my_zsh_path }}/custom"
+# Oh My Zsh's own repo tracks plugins/, and bundles some plugins under the
+# same names as upstream ones, so upstream clones go to ZSH_CUSTOM instead.
+oh_my_zsh_plugins:
+  - name: zsh-autosuggestions
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+  # Supersedes zsh-syntax-highlighting; don't install both.
+  - name: fast-syntax-highlighting
+    repo: https://github.com/zdharma-continuum/fast-syntax-highlighting.git
+  - name: zsh-autocomplete
+    repo: https://github.com/marlonrichert/zsh-autocomplete.git
 zsh_completions_path: "{{ oh_my_zsh_path }}/completions"
 # Most Debian-first AI CLIs researched here do not publish official zsh completions.
 shell_generated_completions: []
