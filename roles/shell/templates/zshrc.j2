@@ -33,7 +33,8 @@ plugins=(
   timer
 
   zsh-autosuggestions
-  zsh-syntax-highlighting
+  # fast-syntax-highlighting supersedes zsh-syntax-highlighting; loading both
+  # makes two plugins fight over the same ZLE hooks.
   fast-syntax-highlighting
   # zsh-autocomplete
 )
